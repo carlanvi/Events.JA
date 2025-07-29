@@ -3,24 +3,34 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Events — Discover & Post</title>
-<meta name="description" content="Discover events. Post your own. Filter by location, date & category." />
-
+<title>Events — Discover Jamaica</title>
+<meta name="description" content="Discover events. Filter by location, date & category." />
 <style>
   :root{
-    --bg:#0b1020; --card:#10172a; --muted:#9aa4b2; --text:#ecf2ff; --accent:#5ca0ff; --accent-2:#9bffd1; --ring: rgba(92,160,255,.45);
+    --bg:#0b1020; --card:#10172a; --muted:#9aa4b2; --text:#ecf2ff;
+    --accent:#5ca0ff; --accent-2:#9bffd1; --ring: rgba(92,160,255,.45);
   }
   *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background: radial-gradient(1200px 600px at 80% -10%, #14203d 0%, #0b1020 60%), var(--bg); color:var(--text)}
+  body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    background: radial-gradient(1200px 600px at 80% -10%, #14203d 0%, #0b1020 60%), var(--bg); color:var(--text)}
   .container{max-width:1100px;margin:0 auto;padding:24px}
-  header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+
+  /* Header with top search */
+  header{display:grid;grid-template-columns: auto 1fr auto;gap:14px;align-items:center;margin-bottom:16px}
   .brand{display:flex;align-items:center;gap:12px}
   .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 6px 18px rgba(92,160,255,.35)}
-  h1{font-size:1.1rem;margin:0;letter-spacing:.3px}
-  .sub{color:var(--muted);font-size:.85rem;margin:2px 0 0}
+  .title-wrap h1{font-size:1.05rem;margin:0 0 2px 0;letter-spacing:.3px}
+  .title-wrap .sub{color:var(--muted);font-size:.85rem;margin:0}
 
-  /* Header actions (avatar + buttons) */
-  .actions-wrap{display:flex;gap:8px;align-items:center}
+  .top-search input{
+    width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);
+    background:#0f1527;color:var(--text);outline:none;font-size:.98rem
+  }
+  .top-search input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--ring)}
+
+  .right-actions{display:flex;gap:10px;align-items:center}
+
+  /* Avatar & host button */
   .avatar-btn{
     width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.14);
     background:#0f1527; overflow:hidden; display:inline-flex; align-items:center; justify-content:center;
@@ -28,29 +38,39 @@
   }
   .avatar-img{width:100%;height:100%;object-fit:cover;display:block}
   .avatar-fallback{font-weight:800;letter-spacing:.3px;color:#cfe3ff}
+  .hostBtn{
+    padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(135deg,var(--accent),#3b82f6);color:#fff;font-weight:700;cursor:pointer;
+    box-shadow:0 8px 18px rgba(59,130,246,.35); display:none /* visible only when verified host */
+  }
+  .hostBtn:hover{filter:brightness(1.05)}
 
-  /* Controls */
-  .bar{display:grid;gap:12px;background:rgba(16,23,42,.7);border:1px solid rgba(255,255,255,.06);backdrop-filter: blur(6px);padding:14px;border-radius:14px;box-shadow: 0 10px 30px rgba(0,0,0,.25)}
-  .filters{grid-template-columns: 1fr 180px 160px 160px 150px}
-  .actions{grid-template-columns: 1fr 1fr 1fr}
-  .bar input,.bar select,.bar button{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#0f1527;color:var(--text);outline:none;font-size:.95rem;transition:border-color .15s, box-shadow .15s}
-  .bar input:focus,.bar select:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--ring)}
-  .bar button{background:linear-gradient(135deg,var(--accent),#3b82f6);border:none;font-weight:700;cursor:pointer;box-shadow:0 8px 18px rgba(59,130,246,.35)}
-  .bar button:hover{filter:brightness(1.05)}
-  @media (max-width: 980px){ .filters{grid-template-columns: 1fr 1fr 1fr 1fr 120px} .actions{grid-template-columns:1fr 1fr} }
-  @media (max-width: 640px){ .filters{grid-template-columns: 1fr 1fr} .filters .wide{grid-column: 1/-1} }
+  /* Filter bar (under header) */
+  .bar{display:grid;gap:12px;background:rgba(16,23,42,.7);border:1px solid rgba(255,255,255,.06);
+       backdrop-filter: blur(6px);padding:14px;border-radius:14px;box-shadow: 0 10px 30px rgba(0,0,0,.25)}
+  .filters{grid-template-columns: 180px 160px 160px 150px auto}
+  .bar select,.bar input,.bar button{
+    width:100%;padding:11px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);
+    background:#0f1527;color:var(--text);outline:none;font-size:.95rem
+  }
+  .bar select:focus,.bar input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--ring)}
+  .bar button{background:#0f1527;border:1px solid rgba(255,255,255,.12);cursor:pointer}
+  .bar button:hover{border-color:var(--accent)}
 
   .meta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:18px 2px;color:var(--muted);font-size:.92rem}
 
-  /* Grid */
+  /* Grid of events */
   .grid{display:grid;grid-template-columns: repeat(3, minmax(0,1fr));gap:16px}
   @media (max-width: 980px){ .grid{ grid-template-columns: repeat(2, 1fr);} }
   @media (max-width: 640px){ .grid{ grid-template-columns: 1fr;} }
 
-  .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));border: 1px solid rgba(255,255,255,.06);border-radius:16px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.35);display:flex;flex-direction:column}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+        border: 1px solid rgba(255,255,255,.06);border-radius:16px;overflow:hidden;
+        box-shadow:0 12px 30px rgba(0,0,0,.35);display:flex;flex-direction:column}
   .thumb{position:relative;height:170px;overflow:hidden;background:#0f162e}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block;opacity:.95;transform:scale(1.02)}
-  .chip{position:absolute;left:10px;top:10px;padding:6px 10px;border-radius:999px;background:rgba(12, 215, 172, .15);color:#9bffd1;font-weight:700;font-size:.75rem;letter-spacing:.3px;border:1px solid rgba(155,255,209,.25)}
+  .chip{position:absolute;left:10px;top:10px;padding:6px 10px;border-radius:999px;background:rgba(12, 215, 172, .15);
+        color:#9bffd1;font-weight:700;font-size:.75rem;letter-spacing:.3px;border:1px solid rgba(155,255,209,.25)}
   .content{padding:14px 14px 12px}
   .title{font-weight:800;margin:0 0 6px;font-size:1.05rem;letter-spacing:.2px}
   .muted{color:var(--muted);font-size:.92rem}
@@ -61,7 +81,7 @@
   .btn:hover{border-color:var(--accent)}
   .empty{border:1px dashed rgba(255,255,255,.14);border-radius:14px;padding:28px;text-align:center;color:var(--muted);margin-top:16px}
 
-  /* Modal */
+  /* Dialogs */
   dialog{border:none;border-radius:14px;padding:0;max-width:720px;width:95%}
   .modal{background:#0f1527;color:var(--text);border:1px solid rgba(255,255,255,.06);border-radius:14px;overflow:hidden}
   .modal header{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -73,40 +93,38 @@
   .pill{padding:6px 10px;border-radius:999px;background:#0b1120;border:1px solid rgba(255,255,255,.08);font-size:.8rem}
   .danger{background:linear-gradient(135deg,#ef4444,#dc2626)!important}
   .linklike{background:transparent;border:1px dashed rgba(255,255,255,.2);color:#cfe3ff}
-
-  /* Profile quick panel text */
   .small{font-size:.9rem;color:var(--muted)}
 </style>
 </head>
 <body>
   <div class="container">
+    <!-- HEADER (search on top) -->
     <header>
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
-        <div>
+        <div class="title-wrap">
           <h1>Discover Events</h1>
-          <p class="sub">Browse. Filter. Post your own (saved locally, or export/import).</p>
+          <p class="sub">Filter by location, date & category</p>
         </div>
       </div>
 
-      <div class="actions-wrap">
-        <button id="openPost" class="btn">+ Post Event</button>
-        <button id="exportBtn" class="btn">Export</button>
-        <label class="btn" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer">
-          Import <input id="importFile" type="file" accept="application/json" style="display:none">
-        </label>
+      <!-- Top search input -->
+      <div class="top-search">
+        <input id="qTop" type="text" placeholder="Search events (title, venue, description)..." />
+      </div>
 
-        <!-- Avatar button -->
-        <button id="avatarBtn" class="avatar-btn" title="Profile">
+      <!-- Right: host button (only when verified) + avatar -->
+      <div class="right-actions">
+        <button id="hostBtn" class="hostBtn" title="Host Dashboard">Host Dashboard</button>
+        <button id="avatarBtn" class="avatar-btn" title="Your Profile">
           <span id="avatarFallback" class="avatar-fallback">U</span>
           <img id="avatarImg" class="avatar-img" alt="" style="display:none" />
         </button>
       </div>
     </header>
 
-    <!-- FILTER BAR -->
+    <!-- FILTER BAR (no post/export/import on front page) -->
     <div class="bar filters" id="filters">
-      <input class="wide" id="q" type="text" placeholder="Search events (title, venue, description)..." />
       <select id="location"></select>
       <select id="category"></select>
       <input id="start" type="date" />
@@ -119,44 +137,10 @@
       <div id="activeFilters"></div>
     </div>
 
-    <!-- GRID -->
+    <!-- EVENT GRID -->
     <section class="grid" id="grid"></section>
     <div id="empty" class="empty" style="display:none;">No events match your filters.</div>
   </div>
-
-  <!-- POST EVENT MODAL -->
-  <dialog id="postDialog">
-    <form method="dialog" class="modal" id="postForm">
-      <header><strong>Post a New Event</strong></header>
-      <div class="body">
-        <div class="grid-2">
-          <div><label>Title <input id="fTitle" required placeholder="Event title"></label></div>
-          <div><label>Category
-            <select id="fCategory" required>
-              <option value="">Select…</option>
-              <option>Music</option><option>Food & Drink</option><option>Sports</option>
-              <option>Business</option><option>Culture</option><option>Family</option><option>Nightlife</option>
-            </select></label></div>
-          <div><label>Location (City/Town) <input id="fLocation" required placeholder="Kingston"></label></div>
-          <div><label>Venue <input id="fVenue" required placeholder="National Stadium"></label></div>
-          <div><label>Start Date & Time <input id="fStart" type="datetime-local" required></label></div>
-          <div><label>End Date & Time <input id="fEnd" type="datetime-local" required></label></div>
-          <div><label>Ticket Price (JMD) <input id="fPrice" type="number" min="0" step="1" value="0" required></label></div>
-          <div><label>Cover Image <input id="fCover" type="file" accept="image/*"></label></div>
-          <div style="grid-column:1/-1"><label>Description <textarea id="fDesc" rows="4" placeholder="Describe your event"></textarea></label></div>
-        </div>
-        <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-          <span class="pill">No login required (demo)</span>
-          <span class="pill">Saved locally</span>
-          <span class="pill">Use Export/Import to share</span>
-        </div>
-      </div>
-      <footer>
-        <button value="cancel" class="btn linklike">Cancel</button>
-        <button id="saveEventBtn" class="btn">Save Event</button>
-      </footer>
-    </form>
-  </dialog>
 
   <!-- PROFILE MODAL -->
   <dialog id="profileDialog">
@@ -193,9 +177,9 @@
               </select></label>
             </div>
             <div><label>Name on ID (exact) <input id="hIdName" placeholder="Jane Doe"></label></div>
-            <div><label>ID Image (front or main page) <input id="hIdImage" type="file" accept="image/*"></label></div>
+            <div><label>ID Image (front/main page) <input id="hIdImage" type="file" accept="image/*"></label></div>
           </div>
-          <p class="small">For this demo, we will verify that <strong>Name on ID</strong> exactly matches your profile <strong>Full Name</strong> and that an <strong>ID image</strong> is uploaded.</p>
+          <p class="small">We’ll verify locally that <strong>Name on ID</strong> exactly matches your profile <strong>Full Name</strong> and an <strong>ID image</strong> is uploaded. (For real KYC you’ll need a backend.)</p>
         </div>
 
         <div id="profileSummary" style="margin-top:10px"></div>
@@ -208,10 +192,43 @@
     </form>
   </dialog>
 
+  <!-- HOST DASHBOARD (only for verified hosts) -->
+  <dialog id="hostDialog">
+    <form method="dialog" class="modal" id="postForm">
+      <header><strong>Host Dashboard — Post Event</strong></header>
+      <div class="body">
+        <div class="grid-2">
+          <div><label>Title <input id="fTitle" required placeholder="Event title"></label></div>
+          <div><label>Category
+            <select id="fCategory" required>
+              <option value="">Select…</option>
+              <option>Music</option><option>Food & Drink</option><option>Sports</option>
+              <option>Business</option><option>Culture</option><option>Family</option><option>Nightlife</option>
+            </select></label></div>
+          <div><label>Location (City/Town) <input id="fLocation" required placeholder="Kingston"></label></div>
+          <div><label>Venue <input id="fVenue" required placeholder="National Stadium"></label></div>
+          <div><label>Start Date & Time <input id="fStart" type="datetime-local" required></label></div>
+          <div><label>End Date & Time <input id="fEnd" type="datetime-local" required></label></div>
+          <div><label>Ticket Price (JMD) <input id="fPrice" type="number" min="0" step="1" value="0" required></label></div>
+          <div><label>Cover Image <input id="fCover" type="file" accept="image/*"></label></div>
+          <div style="grid-column:1/-1"><label>Description <textarea id="fDesc" rows="4" placeholder="Describe your event"></textarea></label></div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+          <span class="pill">Host verified (local)</span>
+          <span class="pill">Saved in this browser</span>
+        </div>
+      </div>
+      <footer>
+        <button value="cancel" class="btn linklike">Close</button>
+        <button id="saveEventBtn" class="btn">Save Event</button>
+      </footer>
+    </form>
+  </dialog>
+
 <script>
 /* ===== Local DB (events) ===== */
 const DB_KEY = 'events_v1';
-const readDB = () => JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+const readDB = () => JSON.parse(localStorage.getItem(DB_KEY) || 'null') || [];
 const writeDB = (list) => localStorage.setItem(DB_KEY, JSON.stringify(list));
 
 /* ===== Local Profile ===== */
@@ -238,41 +255,27 @@ const fileToDataURL = (file) => new Promise((resolve,reject)=>{
 });
 const initialsOf = (name='') => name.trim().split(/\s+/).map(s=>s[0]?.toUpperCase()).slice(0,2).join('') || 'U';
 
-/* ===== Elements ===== */
+/* ===== Elements & State ===== */
 let state = { q:"", location:"All", category:"All", start:"", end:"" };
 
 const els = {
+  // grid
   grid: document.getElementById('grid'),
   count: document.getElementById('count'),
   empty: document.getElementById('empty'),
   activeFilters: document.getElementById('activeFilters'),
-  q: document.getElementById('q'),
+  // filters & search
+  qTop: document.getElementById('qTop'),
   location: document.getElementById('location'),
   category: document.getElementById('category'),
   start: document.getElementById('start'),
   end: document.getElementById('end'),
   clear: document.getElementById('clear'),
-
-  openPost: document.getElementById('openPost'),
-  postDialog: document.getElementById('postDialog'),
-  postForm: document.getElementById('postForm'),
-  fTitle: document.getElementById('fTitle'),
-  fCategory: document.getElementById('fCategory'),
-  fLocation: document.getElementById('fLocation'),
-  fVenue: document.getElementById('fVenue'),
-  fStart: document.getElementById('fStart'),
-  fEnd: document.getElementById('fEnd'),
-  fPrice: document.getElementById('fPrice'),
-  fCover: document.getElementById('fCover'),
-  fDesc: document.getElementById('fDesc'),
-  saveEventBtn: document.getElementById('saveEventBtn'),
-  exportBtn: document.getElementById('exportBtn'),
-  importFile: document.getElementById('importFile'),
-
+  // profile & host
   avatarBtn: document.getElementById('avatarBtn'),
   avatarImg: document.getElementById('avatarImg'),
   avatarFallback: document.getElementById('avatarFallback'),
-
+  hostBtn: document.getElementById('hostBtn'),
   profileDialog: document.getElementById('profileDialog'),
   profileForm: document.getElementById('profileForm'),
   pName: document.getElementById('pName'),
@@ -288,10 +291,23 @@ const els = {
   hIdImage: document.getElementById('hIdImage'),
   saveProfileBtn: document.getElementById('saveProfileBtn'),
   logoutBtn: document.getElementById('logoutBtn'),
-  profileSummary: document.getElementById('profileSummary')
+  profileSummary: document.getElementById('profileSummary'),
+  // host dialog (post event)
+  hostDialog: document.getElementById('hostDialog'),
+  postForm: document.getElementById('postForm'),
+  fTitle: document.getElementById('fTitle'),
+  fCategory: document.getElementById('fCategory'),
+  fLocation: document.getElementById('fLocation'),
+  fVenue: document.getElementById('fVenue'),
+  fStart: document.getElementById('fStart'),
+  fEnd: document.getElementById('fEnd'),
+  fPrice: document.getElementById('fPrice'),
+  fCover: document.getElementById('fCover'),
+  fDesc: document.getElementById('fDesc'),
+  saveEventBtn: document.getElementById('saveEventBtn')
 };
 
-/* ===== Filters (build from data) ===== */
+/* ===== Filters: build from data ===== */
 function refreshFilterOptions(list){
   const locations = Array.from(new Set(list.map(e=>e.location).filter(Boolean))).sort();
   const categories = Array.from(new Set(list.map(e=>e.category).filter(Boolean))).sort();
@@ -299,7 +315,7 @@ function refreshFilterOptions(list){
   els.category.innerHTML = `<option value="All">All categories</option>` + categories.map(c=>`<option>${c}</option>`).join('');
 }
 
-/* ===== Render Events ===== */
+/* ===== Render events ===== */
 function applyFilters(){
   let results = readDB();
 
@@ -378,43 +394,9 @@ function render(list){
   els.grid.appendChild(frag);
 }
 
-/* ===== Post Event ===== */
-els.openPost.addEventListener('click', ()=>{
-  els.postForm.reset();
-  els.postDialog.showModal();
-});
-els.saveEventBtn.addEventListener('click', async (e)=>{
-  e.preventDefault();
-  const title = els.fTitle.value.trim();
-  const category = els.fCategory.value.trim();
-  const locationCity = els.fLocation.value.trim();
-  const venue = els.fVenue.value.trim();
-  const start = els.fStart.value;
-  const end = els.fEnd.value;
-  const price = Number(els.fPrice.value || 0);
-
-  if(!title || !category || !locationCity || !venue || !start || !end){
-    alert('Please fill in all required fields.');
-    return;
-  }
-  if (new Date(end) < new Date(start)){
-    alert('End date/time must be after start date/time.');
-    return;
-  }
-  const coverDataUrl = await fileToDataURL(els.fCover.files[0]);
-  const newEvent = {
-    id: uid(), title, category, location: locationCity, venue,
-    startsAt: new Date(start).toISOString(),
-    endsAt: new Date(end).toISOString(),
-    priceJMD: price, description: els.fDesc.value || '', cover: coverDataUrl
-  };
-  const all = readDB(); all.push(newEvent); writeDB(all);
-  els.postDialog.close(); applyFilters();
-});
-
-/* ===== Filters wiring ===== */
-['input','change'].forEach(evt=>{
-  els.q.addEventListener(evt, ()=>{ state.q = els.q.value; applyFilters(); });
+/* ===== Search & filters wiring ===== */
+els.qTop.addEventListener('input', ()=>{ state.q = els.qTop.value; applyFilters(); });
+['change','input'].forEach(evt=>{
   els.location.addEventListener(evt, ()=>{ state.location = els.location.value; applyFilters(); });
   els.category.addEventListener(evt, ()=>{ state.category = els.category.value; applyFilters(); });
   els.start.addEventListener(evt, ()=>{ state.start = els.start.value; applyFilters(); });
@@ -422,50 +404,24 @@ els.saveEventBtn.addEventListener('click', async (e)=>{
 });
 els.clear.addEventListener('click', ()=>{
   state = { q:"", location:"All", category:"All", start:"", end:"" };
-  els.q.value = ''; els.location.value = 'All'; els.category.value = 'All'; els.start.value = ''; els.end.value = '';
+  els.qTop.value = ''; els.location.value = 'All'; els.category.value = 'All'; els.start.value = ''; els.end.value = '';
   applyFilters();
 });
 
-/* ===== Export / Import ===== */
-els.exportBtn.addEventListener('click', ()=>{
-  const data = readDB();
-  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = 'events-export.json';
-  document.body.appendChild(a); a.click(); a.remove();
-});
-els.importFile.addEventListener('change', async ()=>{
-  const file = els.importFile.files[0]; if (!file) return;
-  const text = await file.text();
-  try{
-    const list = JSON.parse(text);
-    if (!Array.isArray(list)) throw new Error('Invalid file');
-    const normalized = list.map(e=>({
-      id: e.id || uid(),
-      title: e.title || 'Untitled',
-      category: e.category || 'Event',
-      location: e.location || '',
-      venue: e.venue || '',
-      startsAt: e.startsAt ? new Date(e.startsAt).toISOString() : new Date().toISOString(),
-      endsAt: e.endsAt ? new Date(e.endsAt).toISOString() : '',
-      priceJMD: Number(e.priceJMD||0),
-      description: e.description || '',
-      cover: e.cover || ''
-    }));
-    writeDB(normalized); applyFilters(); els.importFile.value = '';
-    alert('Events imported.');
-  }catch(err){ alert('Could not import file.'); }
-});
-
-/* ===== Profile: load, show on avatar, open modal ===== */
+/* ===== Profile helpers ===== */
 function setAvatarFromProfile(p){
+  const img = els.avatarImg, fb = els.avatarFallback;
   if (p?.photo){
-    els.avatarImg.src = p.photo; els.avatarImg.style.display='block'; els.avatarFallback.style.display='none';
+    img.src = p.photo; img.style.display='block'; fb.style.display='none';
   } else {
-    els.avatarImg.style.display='none'; els.avatarFallback.style.display='inline-flex';
-    els.avatarFallback.textContent = initialsOf(p?.name || 'User');
+    img.style.display='none'; fb.style.display='inline-flex';
+    fb.textContent = initialsOf(p?.name || 'User');
   }
+  // show host button only if verified host
+  const showHost = !!(p?.isHost && p?.host?.verified);
+  els.hostBtn.style.display = showHost ? 'inline-block' : 'none';
 }
+
 function fillProfileForm(p){
   els.pName.value = p?.name || '';
   els.pEmail.value = p?.email || '';
@@ -476,103 +432,139 @@ function fillProfileForm(p){
   els.hOrgName.value = p?.host?.orgName || '';
   els.hIdType.value = p?.host?.idType || '';
   els.hIdName.value = p?.host?.idName || '';
-  els.hIdImage.value = ''; // never prefill file input
+  els.hIdImage.value = ''; // never persist file input
   renderProfileSummary(p);
 }
 function renderProfileSummary(p){
-  const hostBadge = p?.isHost ? (p?.host?.verified ? '✅ Host verified (local)' : '⚠️ Host not verified') : '—';
-  els.profileSummary.innerHTML = `
+  const status = p?.isHost ? (p?.host?.verified ? '✅ Host verified (local)' : '⚠️ Host not verified') : '—';
+  document.getElementById('profileSummary').innerHTML = `
     <div style="margin-top:6px;display:flex;gap:10px;flex-wrap:wrap">
       <span class="pill">Name: ${p?.name || '-'}</span>
       <span class="pill">Email: ${p?.email || '-'}</span>
       <span class="pill">City: ${p?.city || '-'}</span>
       <span class="pill">Host: ${p?.isHost ? 'Yes' : 'No'}</span>
-      ${p?.isHost ? `<span class="pill">Status: ${hostBadge}</span>` : ''}
+      ${p?.isHost ? `<span class="pill">Status: ${status}</span>` : ''}
     </div>
-    <p class="small" style="margin-top:8px">Note: This demo stores your profile only in your browser. Real verification requires a secure server.</p>
+    <p class="small" style="margin-top:8px">Note: This is a local demo; real verification needs a backend.</p>
   `;
 }
-function openProfile(){
+
+/* ===== Open dialogs ===== */
+document.getElementById('avatarBtn').addEventListener('click', ()=>{
   const p = readProfile();
   fillProfileForm(p);
-  els.profileDialog.showModal();
-}
-els.avatarBtn.addEventListener('click', openProfile);
-
-/* Toggle host fields */
-els.pIsHost.addEventListener('change', ()=>{
-  els.hostFields.style.display = (els.pIsHost.value === 'yes') ? 'block' : 'none';
+  document.getElementById('profileDialog').showModal();
 });
-
-/* Save profile with validations */
-els.saveProfileBtn.addEventListener('click', async (e)=>{
-  e.preventDefault();
-
-  const name = els.pName.value.trim();
-  const email = els.pEmail.value.trim();
-  if (!name || !email){
-    alert('Please enter your name and email.');
+document.getElementById('hostBtn').addEventListener('click', ()=>{
+  // safety: block if not verified host
+  const p = readProfile();
+  if (!(p?.isHost && p?.host?.verified)) {
+    alert('You must be a verified host to post events.');
     return;
   }
+  document.getElementById('hostDialog').showModal();
+});
 
-  let photoDataUrl = readProfile()?.photo || '';
-  if (els.pPhoto.files[0]){
-    photoDataUrl = await fileToDataURL(els.pPhoto.files[0]);
-  }
+/* ===== Host fields toggle ===== */
+document.getElementById('pIsHost').addEventListener('change', (e)=>{
+  document.getElementById('hostFields').style.display = (e.target.value === 'yes') ? 'block' : 'none';
+});
 
-  const isHost = (els.pIsHost.value === 'yes');
-  let host = null;
-  let hostVerified = false;
+/* ===== Save profile (with host verification) ===== */
+document.getElementById('saveProfileBtn').addEventListener('click', async (e)=>{
+  e.preventDefault();
+  const name = document.getElementById('pName').value.trim();
+  const email = document.getElementById('pEmail').value.trim();
+  if (!name || !email){ alert('Please enter your name and email.'); return; }
 
+  const prev = readProfile();
+  let photoDataUrl = prev?.photo || '';
+  const photoFile = document.getElementById('pPhoto').files[0];
+  if (photoFile){ photoDataUrl = await fileToDataURL(photoFile); }
+
+  const isHost = (document.getElementById('pIsHost').value === 'yes');
+  let host = null, verified = false;
   if (isHost){
-    const orgName = els.hOrgName.value.trim();
-    const idType = els.hIdType.value;
-    const idName = els.hIdName.value.trim();
-    const idImgFile = els.hIdImage.files[0];
+    const orgName = document.getElementById('hOrgName').value.trim();
+    const idType = document.getElementById('hIdType').value;
+    const idName = document.getElementById('hIdName').value.trim();
+    const idImgFile = document.getElementById('hIdImage').files[0];
 
-    if (!orgName || !idType || !idName){
-      alert('Please complete all host fields: Organizer name, ID type, and Name on ID.');
-      return;
-    }
-    // Simple client-side check: ID name must exactly match profile name, and ID image must be uploaded.
-    if (!idImgFile){
-      alert('Please upload an ID image.');
-      return;
-    }
+    if (!orgName || !idType || !idName){ alert('Complete all host fields.'); return; }
+    if (!idImgFile){ alert('Upload an ID image.'); return; }
+    if (idName !== name){ alert('Name on ID must exactly match your profile Full Name.'); return; }
+
     const idImage = await fileToDataURL(idImgFile);
-    hostVerified = (idName === name) && !!idImage;
-    if (!hostVerified){
-      alert('Name on ID must exactly match your profile Full Name.');
-      return;
-    }
-    host = { orgName, idType, idName, idImage, verified: hostVerified };
+    verified = !!idImage && (idName === name);
+    host = { orgName, idType, idName, idImage, verified };
   }
 
-  const profile = {
-    name, email,
-    phone: els.pPhone.value.trim(),
-    city: els.pCity.value.trim(),
-    photo: photoDataUrl,
-    isHost,
-    host
+  const profile = { name, email,
+    phone: document.getElementById('pPhone').value.trim(),
+    city: document.getElementById('pCity').value.trim(),
+    photo: photoDataUrl, isHost, host
   };
   writeProfile(profile);
   setAvatarFromProfile(profile);
   renderProfileSummary(profile);
-  els.profileDialog.close();
-});
+  document.getElementById('profileDialog').close();
 
-/* Clear profile */
-els.logoutBtn.addEventListener('click', ()=>{
-  if (confirm('Clear your saved profile from this browser?')){
-    clearProfile();
-    setAvatarFromProfile(null);
-    els.profileDialog.close();
+  if (profile.isHost && profile.host?.verified){
+    // show host button after successful verification
+    document.getElementById('hostBtn').style.display = 'inline-block';
   }
 });
 
-/* ===== Initial boot ===== */
-if (readDB().length === 0) { writeDB([]); }
+/* ===== Clear profile ===== */
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  if (confirm('Clear your saved profile from this browser?')){
+    clearProfile();
+    setAvatarFromProfile(null);
+    document.getElementById('profileDialog').close();
+    alert('Profile cleared.');
+  }
+});
+
+/* ===== Save Event (Host Dashboard) ===== */
+document.getElementById('saveEventBtn').addEventListener('click', async (e)=>{
+  e.preventDefault();
+  const p = readProfile();
+  if (!(p?.isHost && p?.host?.verified)){
+    alert('Only verified hosts can post events.');
+    return;
+  }
+
+  const title = els.fTitle.value.trim();
+  const category = els.fCategory.value.trim();
+  const locationCity = els.fLocation.value.trim();
+  const venue = els.fVenue.value.trim();
+  const start = els.fStart.value;
+  const end = els.fEnd.value;
+  const price = Number(els.fPrice.value || 0);
+  if(!title || !category || !locationCity || !venue || !start || !end){
+    alert('Please fill in all required fields.'); return;
+  }
+  if (new Date(end) < new Date(start)){ alert('End must be after start.'); return; }
+
+  const coverDataUrl = await fileToDataURL(els.fCover.files[0]);
+
+  const newEvent = {
+    id: uid(), title, category,
+    location: locationCity, venue,
+    startsAt: new Date(start).toISOString(),
+    endsAt: new Date(end).toISOString(),
+    priceJMD: price, description: els.fDesc.value || '',
+    cover: coverDataUrl,
+    hostId: p.email || p.name // simple host tag for now
+  };
+  const all = readDB(); all.push(newEvent); writeDB(all);
+  document.getElementById('hostDialog').close();
+  applyFilters();
+  alert('Event posted.');
+});
+
+/* ===== Boot ===== */
+if (readDB().length === 0) writeDB([]);
 refreshFilterOptions(readDB());
 applyFilters();
 
