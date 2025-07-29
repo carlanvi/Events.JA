@@ -9,42 +9,27 @@
   :root{
     --bg:#0b1020; --card:#10172a; --muted:#9aa4b2; --text:#ecf2ff;
     --accent:#5ca0ff; --accent-2:#9bffd1; --ring: rgba(92,160,255,.45);
-    --primary-start:#22c55e; --primary-end:#16a34a; /* Save button gradient */
+    --primary-start:#22c55e; --primary-end:#16a34a;
   }
-  /* Base & overflow guard */
   *{ box-sizing:border-box; }
-  html, body{ height:100%; }
-  html, body{ margin:0; overflow-x:hidden; }
+  html, body{ height:100%; margin:0; overflow-x:hidden; }
   body{
     font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     background: radial-gradient(1200px 600px at 80% -10%, #14203d 0%, #0b1020 60%), var(--bg);
     color:var(--text);
   }
-
   .container{ max-width:1100px; margin:0 auto; padding:24px 16px; }
 
-  /* HEADER */
+  /* HEADER: avatar anchored to extreme right */
   header{
-    display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; margin-bottom:6px;
+    display:flex; align-items:center; gap:12px; margin-bottom:6px;
   }
   .brand{ display:flex; align-items:center; gap:12px; min-width:0; }
   .logo{ width:40px; height:40px; border-radius:12px;
     background:linear-gradient(135deg,var(--accent),var(--accent-2)); box-shadow:0 6px 18px rgba(92,160,255,.35); }
-  .title-wrap{ min-width:0; }
-  .title-wrap h1{
-    font-size:1.2rem; margin:0; letter-spacing:.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  }
-  .right-actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-
-  /* User chip (shows after profile is saved) */
-  .user-chip{
-    display:inline-flex; align-items:center; gap:8px;
-    background:#0f1527; border:1px solid rgba(255,255,255,.12);
-    padding:8px 10px; border-radius:999px; font-size:.9rem; color:#ecf2ff;
-  }
-  .user-chip .dot{ width:8px; height:8px; border-radius:50%; background:#9aa4b2; }
-  .user-chip .badge{ font-size:.75rem; padding:3px 6px; border-radius:8px; border:1px solid rgba(255,255,255,.12); }
-  .user-chip .badge.verified{ background:rgba(34,197,94,.18); border-color:rgba(34,197,94,.35); }
+  .title-wrap h1{ font-size:1.2rem; margin:0; letter-spacing:.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .spacer{ flex:1 1 auto; }         /* pushes right-actions fully to the right */
+  .right-actions{ display:flex; gap:10px; align-items:center; margin-left:auto; }
 
   /* Avatar & Host button */
   .avatar-btn{
@@ -61,10 +46,10 @@
   }
   .hostBtn:hover{ filter:brightness(1.05); }
 
-  /* SEARCH (full-width) with inline filter button on the right */
+  /* SEARCH with inline Filters button on far right of the input */
   .search-wrap{ position:relative; margin:10px 0 14px; }
   .search-wrap input{
-    width:100%; padding:14px 56px 14px 16px; /* extra right padding for button */
+    width:100%; padding:14px 56px 14px 16px;
     border-radius:12px; border:1px solid rgba(255,255,255,.12);
     background:#0f1527; color:var(--text); outline:none; font-size:1rem;
   }
@@ -77,16 +62,13 @@
   }
   .filter-insearch:hover{ filter:brightness(1.05); }
 
-  /* FILTER PANEL (hidden until opened) */
+  /* FILTER PANEL */
   .filters-panel{
-    display:none; /* toggled with JS */
-    margin-bottom:14px;
+    display:none; margin-bottom:14px;
     background:rgba(16,23,42,.7); border:1px solid rgba(255,255,255,.06);
     backdrop-filter: blur(6px); padding:14px; border-radius:14px; box-shadow: 0 10px 30px rgba(0,0,0,.25);
   }
-  .filters-grid{
-    display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
+  .filters-grid{ display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
   .filters-panel select,.filters-panel input,.filters-panel button{
     width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
     background:#0f1527; color:var(--text); outline:none; font-size:.95rem;
@@ -95,8 +77,6 @@
   .filters-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap; }
   .btn-secondary{ background:#0f1527; border:1px solid rgba(255,255,255,.16); color:var(--text); cursor:pointer; }
   .btn-secondary:hover{ border-color:var(--accent); }
-
-  /* Inside-label for date inputs */
   .field{ position:relative; }
   .inside-label{
     pointer-events:none; position:absolute; left:14px; top:50%; transform:translateY(-50%);
@@ -105,10 +85,8 @@
   .field input[type="date"]:focus + .inside-label,
   .field input[type="date"].has-value + .inside-label{ display:none; }
 
-  .meta{
-    display:flex; justify-content:space-between; align-items:center; gap:10px;
-    margin:10px 2px 18px; color:var(--muted); font-size:.92rem; flex-wrap:wrap;
-  }
+  .meta{ display:flex; justify-content:space-between; align-items:center; gap:10px;
+    margin:10px 2px 18px; color:var(--muted); font-size:.92rem; flex-wrap:wrap; }
 
   /* GRID */
   .grid{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:16px; }
@@ -129,24 +107,14 @@
     border:1px solid rgba(155,255,209,.25); max-width:calc(100% - 20px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .content{ padding:14px 14px 12px; }
-  .title{
-    font-weight:800; margin:0 0 6px; font-size:1.05rem; letter-spacing:.2px;
-    overflow-wrap:anywhere;
-  }
+  .title{ font-weight:800; margin:0 0 6px; font-size:1.05rem; overflow-wrap:anywhere; letter-spacing:.2px; }
   .muted{ color:var(--muted); font-size:.92rem; overflow-wrap:anywhere; }
   .row{ display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
-  .badge{
-    padding:4px 8px; border-radius:10px; border:1px solid rgba(255,255,255,.08);
-    background:#0f1527; color:#cdd7e6; font-size:.78rem; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  }
-  .footer{
-    display:flex; justify-content:space-between; align-items:center; gap:8px;
-    padding:12px 14px; border-top:1px solid rgba(255,255,255,.06); flex-wrap:wrap;
-  }
+  .badge{ padding:4px 8px; border-radius:10px; border:1px solid rgba(255,255,255,.08);
+    background:#0f1527; color:#cdd7e6; font-size:.78rem; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .footer{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:12px 14px; border-top:1px solid rgba(255,255,255,.06); flex-wrap:wrap; }
   .btn{ padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:#0f1527; color:#ecf2ff; cursor:pointer; }
   .btn:hover{ border-color:var(--accent); }
-
-  /* Primary button (Save) — bright & obviously clickable */
   .btn-primary{
     background:linear-gradient(135deg,var(--primary-start),var(--primary-end));
     color:#032b13; font-weight:800; border:none;
@@ -155,10 +123,8 @@
   .btn-primary:hover{ filter:brightness(1.05); }
   .btn-primary:active{ transform:translateY(1px); }
 
-  .empty{ border:1px dashed rgba(255,255,255,.14); border-radius:14px; padding:28px; text-align:center; color:#muted; margin-top:16px }
-
   /* DIALOGS */
-  dialog{ border:none; border-radius:14px; padding:0; max-width:min(720px, calc(100vw - 32px)); width:100%; }
+  dialog{ border:none; border-radius:14px; padding:0; max-width:min(760px, calc(100vw - 32px)); width:100%; }
   .modal{ background:#0f1527; color:var(--text); border:1px solid rgba(255,255,255,.06); border-radius:14px; overflow:hidden; }
   .modal header{ padding:14px 18px; border-bottom:1px solid rgba(255,255,255,.08); }
   .modal .body{ padding:16px 18px; }
@@ -172,11 +138,19 @@
   .linklike{ background:transparent; border:1px dashed rgba(255,255,255,.2); color:#cfe3ff; }
   .small{ font-size:.9rem; color:var(--muted); }
 
-  /* Toast */
+  /* Profile VIEW card */
+  .profile-view{ display:none; }
+  .pv-wrap{ display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
+  .pv-photo{ width:90px; height:90px; border-radius:50%; overflow:hidden; border:1px solid rgba(255,255,255,.12); background:#0b1120; }
+  .pv-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .pv-lines{ display:flex; flex-direction:column; gap:6px; }
+  .pv-line{ background:#0b1120; border:1px solid rgba(255,255,255,.08); padding:8px 10px; border-radius:10px; font-size:.95rem; }
+  .pv-badges{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+  .pv-badge{ font-size:.75rem; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:#0f1527; }
+  .pv-badge.verified{ background:rgba(34,197,94,.18); border-color:rgba(34,197,94,.35); }
   .toast{ position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
     background:#0f1527; color:#ecf2ff; border:1px solid rgba(255,255,255,.12);
-    padding:10px 14px; border-radius:10px; box-shadow:0 8px 18px rgba(0,0,0,.35); display:none; z-index:1000;
-  }
+    padding:10px 14px; border-radius:10px; box-shadow:0 8px 18px rgba(0,0,0,.35); display:none; z-index:1000; }
 </style>
 </head>
 <body>
@@ -185,22 +159,10 @@
     <header>
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
-        <div class="title-wrap">
-          <h1>Discover Events</h1>
-        </div>
+        <div class="title-wrap"><h1>Discover Events</h1></div>
       </div>
-
-      <!-- spacer -->
-      <div></div>
-
-      <!-- Right: Host (only when verified) + Chip + Avatar -->
+      <div class="spacer"></div>
       <div class="right-actions">
-        <span id="userChip" class="user-chip" style="display:none">
-          <span class="dot" id="userDot"></span>
-          <span id="userNameChip">User</span>
-          <span id="hostBadge" class="badge" style="display:none">Host</span>
-          <span id="hostBadgeVerified" class="badge verified" style="display:none">Verified Host</span>
-        </span>
         <button id="hostBtn" class="hostBtn" title="Host Dashboard">Host Dashboard</button>
         <button id="avatarBtn" class="avatar-btn" title="Your Profile">
           <span id="avatarFallback" class="avatar-fallback">U</span>
@@ -215,17 +177,15 @@
       <button id="filterToggle" class="filter-insearch" title="Filters">Filters</button>
     </div>
 
-    <!-- FILTER PANEL (hidden until Filters clicked) -->
+    <!-- FILTER PANEL -->
     <section id="filtersPanel" class="filters-panel" aria-hidden="true">
       <div class="filters-grid">
         <select id="location" aria-label="Location">
           <option value="" selected disabled>Location</option>
         </select>
-
         <select id="category" aria-label="Category">
           <option value="" selected disabled>Category</option>
         </select>
-
         <div class="field">
           <input id="start" type="date" aria-label="Start date" />
           <span class="inside-label">Start date</span>
@@ -255,51 +215,73 @@
   <dialog id="profileDialog">
     <form method="dialog" class="modal" id="profileForm">
       <header><strong>Your Profile</strong></header>
+
       <div class="body">
-        <div class="grid-2">
-          <div><label>Full Name <input id="pName" required placeholder="Jane Doe"></label></div>
-          <div><label>Email <input id="pEmail" type="email" required placeholder="jane@example.com"></label></div>
-          <div><label>Phone <input id="pPhone" placeholder="+1 (876) 555‑1234"></label></div>
-          <div><label>Profile Photo <input id="pPhoto" type="file" accept="image/*"></label></div>
-          <div>
-            <label>Are you a host?
-              <select id="pIsHost">
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </label>
+        <!-- EDIT MODE (inputs) -->
+        <div id="profileFormFields">
+          <div class="grid-2">
+            <div><label>Full Name <input id="pName" required placeholder="Jane Doe"></label></div>
+            <div><label>Email <input id="pEmail" type="email" required placeholder="jane@example.com"></label></div>
+            <div><label>Phone <input id="pPhone" placeholder="+1 (876) 555‑1234"></label></div>
+            <div><label>Profile Photo <input id="pPhoto" type="file" accept="image/*"></label></div>
+            <div>
+              <label>Are you a host?
+                <select id="pIsHost">
+                  <option value="no">No</option>
+                  <option value="yes">Yes</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <!-- Host fields -->
+          <div id="hostFields" style="margin-top:12px;display:none">
+            <hr style="border-color:rgba(255,255,255,.08);border-style:solid;border-width:1px 0 0;margin:6px 0 16px">
+            <div class="grid-2">
+              <div><label>Organizer / Business Name <input id="hOrgName" placeholder="My Events JA"></label></div>
+              <div><label>ID Type
+                <select id="hIdType">
+                  <option value="">Select…</option>
+                  <option>Passport</option>
+                  <option>National ID</option>
+                  <option>Driver's License</option>
+                </select></label>
+              </div>
+              <div><label>Name on ID (exact) <input id="hIdName" placeholder="Jane Doe"></label></div>
+              <div><label>ID Image (front/main page) <input id="hIdImage" type="file" accept="image/*"></label></div>
+            </div>
+            <p class="small">Local verification: <strong>Name on ID</strong> must exactly match your profile <strong>Full Name</strong> and an <strong>ID image</strong> is required.</p>
           </div>
         </div>
 
-        <!-- Host section -->
-        <div id="hostFields" style="margin-top:12px;display:none">
-          <hr style="border-color:rgba(255,255,255,.08);border-style:solid;border-width:1px 0 0;margin:6px 0 16px">
-          <div class="grid-2">
-            <div><label>Organizer / Business Name <input id="hOrgName" placeholder="My Events JA"></label></div>
-            <div><label>ID Type
-              <select id="hIdType">
-                <option value="">Select…</option>
-                <option>Passport</option>
-                <option>National ID</option>
-                <option>Driver's License</option>
-              </select></label>
+        <!-- VIEW MODE -->
+        <div id="profileView" class="profile-view">
+          <div class="pv-wrap">
+            <div class="pv-photo"><img id="pvPhoto" alt=""></div>
+            <div class="pv-lines">
+              <div class="pv-line" id="pvName">Name: —</div>
+              <div class="pv-line" id="pvEmail">Email: —</div>
+              <div class="pv-line" id="pvPhone">Phone: —</div>
+              <div class="pv-badges">
+                <span class="pv-badge" id="pvHost" style="display:none">Host</span>
+                <span class="pv-badge verified" id="pvHostVerified" style="display:none">Verified Host</span>
+              </div>
             </div>
-            <div><label>Name on ID (exact) <input id="hIdName" placeholder="Jane Doe"></label></div>
-            <div><label>ID Image (front/main page) <input id="hIdImage" type="file" accept="image/*"></label></div>
           </div>
-          <p class="small">Local verification: <strong>Name on ID</strong> must exactly match your profile <strong>Full Name</strong> and an <strong>ID image</strong> is required.</p>
         </div>
 
         <div id="profileSummary" style="margin-top:10px"></div>
       </div>
+
       <footer>
-        <button id="cancelProfile" type="button" class="btn linklike">Cancel</button>
+        <button id="cancelProfile" type="button" class="btn linklike">Close</button>
+        <button id="editProfileBtn" type="button" class="btn" style="display:none">Edit</button>
         <button id="saveProfileBtn" class="btn btn-primary">Save</button>
       </footer>
     </form>
   </dialog>
 
-  <!-- HOST DASHBOARD (only for verified hosts) -->
+  <!-- HOST DASHBOARD -->
   <dialog id="hostDialog">
     <form method="dialog" class="modal" id="postForm">
       <header><strong>Host Dashboard — Post Event</strong></header>
@@ -332,7 +314,6 @@
     </form>
   </dialog>
 
-  <!-- Toast -->
   <div id="toast" class="toast" role="status" aria-live="polite">Profile saved</div>
 
 <script>
@@ -366,37 +347,33 @@ const initialsOf = (name='') => name.trim().split(/\s+/).map(s=>s[0]?.toUpperCas
 
 /* ===== Elements & State ===== */
 let state = { q:"", location:"", category:"", start:"", end:"" };
-
 const els = {
   grid: document.getElementById('grid'),
   count: document.getElementById('count'),
   empty: document.getElementById('empty'),
   activeFilters: document.getElementById('activeFilters'),
-
   qTop: document.getElementById('qTop'),
   filterToggle: document.getElementById('filterToggle'),
   filtersPanel: document.getElementById('filtersPanel'),
   closeFilters: document.getElementById('closeFilters'),
   resetFilters: document.getElementById('resetFilters'),
-
   location: document.getElementById('location'),
   category: document.getElementById('category'),
   start: document.getElementById('start'),
   end: document.getElementById('end'),
-
   avatarBtn: document.getElementById('avatarBtn'),
   avatarImg: document.getElementById('avatarImg'),
   avatarFallback: document.getElementById('avatarFallback'),
   hostBtn: document.getElementById('hostBtn'),
-
-  userChip: document.getElementById('userChip'),
-  userNameChip: document.getElementById('userNameChip'),
-  userDot: document.getElementById('userDot'),
-  hostBadge: document.getElementById('hostBadge'),
-  hostBadgeVerified: document.getElementById('hostBadgeVerified'),
-
   profileDialog: document.getElementById('profileDialog'),
-  profileForm: document.getElementById('profileForm'),
+  profileFormFields: document.getElementById('profileFormFields'),
+  profileView: document.getElementById('profileView'),
+  pvPhoto: document.getElementById('pvPhoto'),
+  pvName: document.getElementById('pvName'),
+  pvEmail: document.getElementById('pvEmail'),
+  pvPhone: document.getElementById('pvPhone'),
+  pvHost: document.getElementById('pvHost'),
+  pvHostVerified: document.getElementById('pvHostVerified'),
   pName: document.getElementById('pName'),
   pEmail: document.getElementById('pEmail'),
   pPhone: document.getElementById('pPhone'),
@@ -409,8 +386,8 @@ const els = {
   hIdImage: document.getElementById('hIdImage'),
   saveProfileBtn: document.getElementById('saveProfileBtn'),
   cancelProfile: document.getElementById('cancelProfile'),
+  editProfileBtn: document.getElementById('editProfileBtn'),
   profileSummary: document.getElementById('profileSummary'),
-
   hostDialog: document.getElementById('hostDialog'),
   postForm: document.getElementById('postForm'),
   fTitle: document.getElementById('fTitle'),
@@ -423,7 +400,6 @@ const els = {
   fCover: document.getElementById('fCover'),
   fDesc: document.getElementById('fDesc'),
   saveEventBtn: document.getElementById('saveEventBtn'),
-
   toast: document.getElementById('toast')
 };
 
@@ -435,10 +411,9 @@ function refreshFilterOptions(list){
   els.category.innerHTML = `<option value="" selected disabled>Category</option>` + categories.map(c=>`<option>${c}</option>`).join('');
 }
 
-/* ===== Render events (always show; narrow if filters set) ===== */
+/* ===== Render events ===== */
 function applyFilters(){
-  let results = readDB(); // all events by default
-
+  let results = readDB();
   const q = state.q.trim().toLowerCase();
   if (q){
     results = results.filter(e =>
@@ -447,12 +422,8 @@ function applyFilters(){
       (e.description||"").toLowerCase().includes(q)
     );
   }
-  if (state.location){
-    results = results.filter(e => e.location === state.location);
-  }
-  if (state.category){
-    results = results.filter(e => e.category === state.category);
-  }
+  if (state.location){ results = results.filter(e => e.location === state.location); }
+  if (state.category){ results = results.filter(e => e.category === state.category); }
   if (state.start){
     const s = new Date(state.start + "T00:00:00");
     results = results.filter(e => new Date(e.startsAt) >= s);
@@ -463,11 +434,9 @@ function applyFilters(){
   }
   render(results);
 }
-
 function render(list){
   els.grid.innerHTML = '';
   refreshFilterOptions(readDB());
-
   if (!list.length){
     els.count.textContent = '0 events';
     els.empty.style.display = 'block';
@@ -476,9 +445,7 @@ function render(list){
   }
   els.empty.style.display = 'none';
   els.count.textContent = `${list.length} event${list.length>1?'s':''}`;
-
-  const chips = [];
-  if (state.q) chips.push(`Search: “${state.q}”`);
+  const chips=[]; if (state.q) chips.push(`Search: “${state.q}”`);
   if (state.location) chips.push(state.location);
   if (state.category) chips.push(state.category);
   if (state.start) chips.push(`From ${state.start}`);
@@ -486,31 +453,27 @@ function render(list){
   els.activeFilters.textContent = chips.join(' • ');
 
   const frag = document.createDocumentFragment();
-  list
-    .sort((a,b)=> new Date(a.startsAt)-new Date(b.startsAt))
-    .forEach(ev=>{
-      const card = document.createElement('article');
-      card.className = 'card';
-      const cover = ev.cover || '';
-      card.innerHTML = `
-        <div class="thumb">${cover ? `<img src="${cover}" alt="${ev.title}">` : ''}<div class="chip">${ev.category||'Event'}</div></div>
-        <div class="content">
-          <h3 class="title">${ev.title}</h3>
-          <div class="muted">${ev.venue||''}${ev.venue?', ':''}${ev.location||''}</div>
-          <div class="row">
-            <span class="badge">${toLocalDate(ev.startsAt)}</span>
-            ${ev.endsAt ? `<span class="badge">Ends ${toLocalDate(ev.endsAt)}</span>`:''}
-            <span class="badge">${fmtMoney(ev.priceJMD||0)}</span>
-          </div>
-          ${ev.description ? `<p class="muted" style="margin:10px 0 0">${ev.description}</p>`:''}
+  list.sort((a,b)=> new Date(a.startsAt)-new Date(b.startsAt)).forEach(ev=>{
+    const card = document.createElement('article'); card.className='card';
+    const cover = ev.cover || '';
+    card.innerHTML = `
+      <div class="thumb">${cover?`<img src="${cover}" alt="${ev.title}">`:''}<div class="chip">${ev.category||'Event'}</div></div>
+      <div class="content">
+        <h3 class="title">${ev.title}</h3>
+        <div class="muted">${ev.venue||''}${ev.venue?', ':''}${ev.location||''}</div>
+        <div class="row">
+          <span class="badge">${toLocalDate(ev.startsAt)}</span>
+          ${ev.endsAt?`<span class="badge">Ends ${toLocalDate(ev.endsAt)}</span>`:''}
+          <span class="badge">${fmtMoney(ev.priceJMD||0)}</span>
         </div>
-        <div class="footer">
-          <span class="muted">${new URL(location.href).origin}</span>
-          <button class="btn" onclick="alert('Static demo. Connect checkout later.')">View / Buy</button>
-        </div>
-      `;
-      frag.appendChild(card);
-    });
+        ${ev.description?`<p class="muted" style="margin:10px 0 0">${ev.description}</p>`:''}
+      </div>
+      <div class="footer">
+        <span class="muted">${new URL(location.href).origin}</span>
+        <button class="btn" onclick="alert('Static demo. Connect checkout later.')">View / Buy</button>
+      </div>`;
+    frag.appendChild(card);
+  });
   els.grid.appendChild(frag);
 }
 
@@ -519,16 +482,9 @@ els.qTop.addEventListener('input', ()=>{ state.q = els.qTop.value; applyFilters(
 ['change','input'].forEach(evt=>{
   els.location.addEventListener(evt, ()=>{ state.location = els.location.value; applyFilters(); });
   els.category.addEventListener(evt, ()=>{ state.category = els.category.value; applyFilters(); });
-  els.start.addEventListener(evt, ()=>{
-    els.start.classList.toggle('has-value', !!els.start.value);
-    state.start = els.start.value; applyFilters();
-  });
-  els.end.addEventListener(evt, ()=>{
-    els.end.classList.toggle('has-value', !!els.end.value);
-    state.end = els.end.value; applyFilters();
-  });
+  els.start.addEventListener(evt, ()=>{ els.start.classList.toggle('has-value', !!els.start.value); state.start = els.start.value; applyFilters(); });
+  els.end.addEventListener(evt, ()=>{ els.end.classList.toggle('has-value', !!els.end.value); state.end = els.end.value; applyFilters(); });
 });
-/* Toggle filter panel */
 els.filterToggle.addEventListener('click', ()=>{
   const open = els.filtersPanel.style.display === 'block';
   els.filtersPanel.style.display = open ? 'none' : 'block';
@@ -540,47 +496,19 @@ els.closeFilters.addEventListener('click', ()=>{
 });
 els.resetFilters.addEventListener('click', ()=>{
   state = { q: els.qTop.value || "", location:"", category:"", start:"", end:"" };
-  els.location.value = ""; els.category.value = "";
-  els.start.value = ""; els.end.value = "";
-  els.start.classList.remove('has-value'); els.end.classList.remove('has-value');
-  applyFilters();
+  els.location.value = ""; els.category.value = ""; els.start.value = ""; els.end.value = "";
+  els.start.classList.remove('has-value'); els.end.classList.remove('has-value'); applyFilters();
 });
 
-/* ===== Toast helper ===== */
-function showToast(msg='Saved'){
-  els.toast.textContent = msg;
-  els.toast.style.display = 'block';
-  setTimeout(()=>{ els.toast.style.display = 'none'; }, 1400);
-}
+/* ===== Toast ===== */
+function showToast(msg='Saved'){ els.toast.textContent = msg; els.toast.style.display='block'; setTimeout(()=> els.toast.style.display='none', 1400); }
 
 /* ===== Profile helpers ===== */
-function setHeaderChipFromProfile(p){
-  if (!p){
-    els.userChip.style.display = 'none';
-    return;
-  }
-  els.userChip.style.display = 'inline-flex';
-  els.userNameChip.textContent = p.name || 'User';
-  els.userChip.title = p.email || '';
-  // dot color: green if profile exists, gray otherwise
-  els.userDot.style.background = p.name ? '#22c55e' : '#9aa4b2';
-  // host badges
-  const isHost = !!p.isHost;
-  const verified = !!(p.host && p.host.verified);
-  els.hostBadge.style.display = isHost && !verified ? 'inline-block' : 'none';
-  els.hostBadgeVerified.style.display = verified ? 'inline-block' : 'none';
-}
-
 function setAvatarFromProfile(p){
   const img = els.avatarImg, fb = els.avatarFallback;
-  if (p?.photo){
-    img.src = p.photo; img.style.display='block'; fb.style.display='none';
-  } else {
-    img.style.display='none'; fb.style.display='inline-flex';
-    fb.textContent = (p?.name ? initialsOf(p.name) : 'U');
-  }
+  if (p?.photo){ img.src = p.photo; img.style.display='block'; fb.style.display='none'; }
+  else { img.style.display='none'; fb.style.display='inline-flex'; fb.textContent = (p?.name ? initialsOf(p.name) : 'U'); }
   els.hostBtn.style.display = (p?.isHost && p?.host?.verified) ? 'inline-block' : 'none';
-  setHeaderChipFromProfile(p);
 }
 
 function fillProfileForm(p){
@@ -598,19 +526,51 @@ function fillProfileForm(p){
 
 function renderProfileSummary(p){
   const statusText = p?.isHost ? (p?.host?.verified ? '✅ Host verified (local)' : '⚠️ Host not verified') : '';
-  els.profileSummary.innerHTML = statusText
-    ? `<p class="small">Status: ${statusText}</p>`
-    : `<p class="small">Update your profile if you’d like to host events.</p>`;
+  els.profileSummary.innerHTML = statusText ? `<p class="small">Status: ${statusText}</p>` : '';
 }
 
-/* Profile dialog open/close */
+function renderProfileView(p){
+  // photo
+  if (p?.photo){ els.pvPhoto.src = p.photo; els.pvPhoto.style.display='block'; }
+  else { els.pvPhoto.removeAttribute('src'); els.pvPhoto.style.display='none'; }
+  // lines
+  els.pvName.textContent  = `Name: ${p?.name || '—'}`;
+  els.pvEmail.textContent = `Email: ${p?.email || '—'}`;
+  els.pvPhone.textContent = `Phone: ${p?.phone || '—'}`;
+  // badges
+  const isHost = !!p?.isHost;
+  const verified = !!(p?.host && p.host.verified);
+  els.pvHost.style.display = isHost && !verified ? 'inline-block' : 'none';
+  els.pvHostVerified.style.display = verified ? 'inline-block' : 'none';
+}
+
+function setProfileMode(mode){ // 'view' | 'edit'
+  const view = mode === 'view';
+  els.profileFormFields.style.display = view ? 'none' : 'block';
+  els.profileView.style.display = view ? 'block' : 'none';
+  els.saveProfileBtn.style.display = view ? 'none' : 'inline-block';
+  els.editProfileBtn.style.display = view ? 'inline-block' : 'none';
+}
+
+/* Open/Close & Edit */
 els.avatarBtn.addEventListener('click', ()=>{
   const p = readProfile();
-  fillProfileForm(p);
-  els.profileDialog.showModal();
+  if (p){ // show view by default if profile exists
+    renderProfileView(p);
+    renderProfileSummary(p);
+    setProfileMode('view');
+    els.profileDialog.showModal();
+  } else {
+    fillProfileForm(null);
+    setProfileMode('edit');
+    els.profileDialog.showModal();
+  }
 });
-els.cancelProfile.addEventListener('click', ()=>{
-  els.profileDialog.close(); // close without saving
+els.cancelProfile.addEventListener('click', ()=> els.profileDialog.close() );
+els.editProfileBtn.addEventListener('click', ()=>{
+  const p = readProfile();
+  fillProfileForm(p);
+  setProfileMode('edit');
 });
 
 /* Host toggle fields */
@@ -618,7 +578,7 @@ els.pIsHost.addEventListener('change', (e)=>{
   els.hostFields.style.display = (e.target.value === 'yes') ? 'block' : 'none';
 });
 
-/* Save profile (creates or updates profile) — with local host verification */
+/* Save profile (creates/updates, then show VIEW and hide inputs) */
 els.saveProfileBtn.addEventListener('click', async (e)=>{
   e.preventDefault();
   const name = els.pName.value.trim();
@@ -640,51 +600,40 @@ els.saveProfileBtn.addEventListener('click', async (e)=>{
     const idImgFile = els.hIdImage.files[0];
 
     if (!orgName || !idType || !idName){ alert('Complete all host fields.'); return; }
-    if (!idImgFile && !(prev && prev.host && prev.host.idImage)){ alert('Upload an ID image.'); return; }
 
-    // Local name verification: exact match required
-    if (idName !== name){
-      alert('Name on ID must exactly match your profile Full Name.');
-      return;
-    }
+    // allow already-saved ID image when editing
+    const existingIdImage = prev?.host?.idImage || '';
+    const idImage = idImgFile ? await fileToDataURL(idImgFile) : existingIdImage;
+    if (!idImage){ alert('Upload an ID image.'); return; }
 
-    const idImage = idImgFile ? await fileToDataURL(idImgFile) : (prev?.host?.idImage || '');
+    // Local exact-match verification
+    if (idName !== name){ alert('Name on ID must exactly match your profile Full Name.'); return; }
+
     verified = !!idImage && (idName === name);
     host = { orgName, idType, idName, idImage, verified };
   }
 
-  const profile = {
-    name, email,
-    phone: els.pPhone.value.trim(),
-    photo: photoDataUrl,
-    isHost, host
-  };
-
-  writeProfile(profile);                 // <-- this actually creates/updates the profile
-  setAvatarFromProfile(profile);         // update header avatar + chip
-  renderProfileSummary(profile);         // update modal summary
-  els.profileDialog.close();             // close modal
-  showToast('Profile saved');            // neat confirmation
+  const profile = { name, email, phone: els.pPhone.value.trim(), photo: photoDataUrl, isHost, host };
+  writeProfile(profile);
+  setAvatarFromProfile(profile);
+  renderProfileSummary(profile);
+  renderProfileView(profile);
+  setProfileMode('view');       // <-- switch to view, hide inputs
+  showToast('Profile saved');   // feedback
 });
 
 /* Host dashboard access */
 els.hostBtn.addEventListener('click', ()=>{
   const p = readProfile();
-  if (!(p?.isHost && p?.host?.verified)) {
-    alert('You must be a verified host to post events.');
-    return;
-  }
+  if (!(p?.isHost && p?.host?.verified)) { alert('You must be a verified host to post events.'); return; }
   els.hostDialog.showModal();
 });
 
-/* Save Event (Host Dashboard) */
+/* Save Event */
 els.saveEventBtn.addEventListener('click', async (e)=>{
   e.preventDefault();
   const p = readProfile();
-  if (!(p?.isHost && p?.host?.verified)){
-    alert('Only verified hosts can post events.');
-    return;
-  }
+  if (!(p?.isHost && p?.host?.verified)){ alert('Only verified hosts can post events.'); return; }
 
   const title = els.fTitle.value.trim();
   const category = els.fCategory.value.trim();
@@ -693,26 +642,19 @@ els.saveEventBtn.addEventListener('click', async (e)=>{
   const start = els.fStart.value;
   const end = els.fEnd.value;
   const price = Number(els.fPrice.value || 0);
-  if(!title || !category || !locationCity || !venue || !start || !end){
-    alert('Please fill in all required fields.'); return;
-  }
+  if(!title || !category || !locationCity || !venue || !start || !end){ alert('Please fill in all required fields.'); return; }
   if (new Date(end) < new Date(start)){ alert('End must be after start.'); return; }
 
   const coverDataUrl = await fileToDataURL(els.fCover.files[0]);
-
   const newEvent = {
-    id: uid(), title, category,
-    location: locationCity, venue,
+    id: uid(), title, category, location: locationCity, venue,
     startsAt: new Date(start).toISOString(),
     endsAt: new Date(end).toISOString(),
     priceJMD: price, description: els.fDesc.value || '',
-    cover: coverDataUrl,
-    hostId: p.email || p.name
+    cover: coverDataUrl, hostId: p.email || p.name
   };
   const all = readDB(); all.push(newEvent); writeDB(all);
-  els.hostDialog.close();
-  applyFilters();
-  showToast('Event posted');
+  els.hostDialog.close(); applyFilters(); showToast('Event posted');
 });
 
 /* ===== Boot ===== */
