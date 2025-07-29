@@ -9,6 +9,7 @@
   :root{
     --bg:#0b1020; --card:#10172a; --muted:#9aa4b2; --text:#ecf2ff;
     --accent:#5ca0ff; --accent-2:#9bffd1; --ring: rgba(92,160,255,.45);
+    --primary-start:#22c55e; --primary-end:#16a34a; /* Save button gradient */
   }
   /* Base & overflow guard */
   *{ box-sizing:border-box; }
@@ -34,6 +35,16 @@
     font-size:1.2rem; margin:0; letter-spacing:.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .right-actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+
+  /* User chip (shows after profile is saved) */
+  .user-chip{
+    display:inline-flex; align-items:center; gap:8px;
+    background:#0f1527; border:1px solid rgba(255,255,255,.12);
+    padding:8px 10px; border-radius:999px; font-size:.9rem; color:#ecf2ff;
+  }
+  .user-chip .dot{ width:8px; height:8px; border-radius:50%; background:#9aa4b2; }
+  .user-chip .badge{ font-size:.75rem; padding:3px 6px; border-radius:8px; border:1px solid rgba(255,255,255,.12); }
+  .user-chip .badge.verified{ background:rgba(34,197,94,.18); border-color:rgba(34,197,94,.35); }
 
   /* Avatar & Host button */
   .avatar-btn{
@@ -132,9 +143,19 @@
     display:flex; justify-content:space-between; align-items:center; gap:8px;
     padding:12px 14px; border-top:1px solid rgba(255,255,255,.06); flex-wrap:wrap;
   }
-  .btn{ padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:#0f1527; color:#var(--text); cursor:pointer; }
+  .btn{ padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:#0f1527; color:#ecf2ff; cursor:pointer; }
   .btn:hover{ border-color:var(--accent); }
-  .empty{ border:1px dashed rgba(255,255,255,.14); border-radius:14px; padding:28px; text-align:center; color:var(--muted); margin-top:16px }
+
+  /* Primary button (Save) — bright & obviously clickable */
+  .btn-primary{
+    background:linear-gradient(135deg,var(--primary-start),var(--primary-end));
+    color:#032b13; font-weight:800; border:none;
+    box-shadow:0 10px 24px rgba(22,163,74,.35), inset 0 0 0 1px rgba(255,255,255,.15);
+  }
+  .btn-primary:hover{ filter:brightness(1.05); }
+  .btn-primary:active{ transform:translateY(1px); }
+
+  .empty{ border:1px dashed rgba(255,255,255,.14); border-radius:14px; padding:28px; text-align:center; color:#muted; margin-top:16px }
 
   /* DIALOGS */
   dialog{ border:none; border-radius:14px; padding:0; max-width:min(720px, calc(100vw - 32px)); width:100%; }
@@ -150,6 +171,12 @@
   .pill{ padding:6px 10px; border-radius:999px; background:#0b1120; border:1px solid rgba(255,255,255,.08); font-size:.8rem; }
   .linklike{ background:transparent; border:1px dashed rgba(255,255,255,.2); color:#cfe3ff; }
   .small{ font-size:.9rem; color:var(--muted); }
+
+  /* Toast */
+  .toast{ position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
+    background:#0f1527; color:#ecf2ff; border:1px solid rgba(255,255,255,.12);
+    padding:10px 14px; border-radius:10px; box-shadow:0 8px 18px rgba(0,0,0,.35); display:none; z-index:1000;
+  }
 </style>
 </head>
 <body>
@@ -166,8 +193,14 @@
       <!-- spacer -->
       <div></div>
 
-      <!-- Right: Host (only when verified) + Avatar -->
+      <!-- Right: Host (only when verified) + Chip + Avatar -->
       <div class="right-actions">
+        <span id="userChip" class="user-chip" style="display:none">
+          <span class="dot" id="userDot"></span>
+          <span id="userNameChip">User</span>
+          <span id="hostBadge" class="badge" style="display:none">Host</span>
+          <span id="hostBadgeVerified" class="badge verified" style="display:none">Verified Host</span>
+        </span>
         <button id="hostBtn" class="hostBtn" title="Host Dashboard">Host Dashboard</button>
         <button id="avatarBtn" class="avatar-btn" title="Your Profile">
           <span id="avatarFallback" class="avatar-fallback">U</span>
@@ -187,12 +220,10 @@
       <div class="filters-grid">
         <select id="location" aria-label="Location">
           <option value="" selected disabled>Location</option>
-          <!-- options populated from data -->
         </select>
 
         <select id="category" aria-label="Category">
           <option value="" selected disabled>Category</option>
-          <!-- options populated from data -->
         </select>
 
         <div class="field">
@@ -229,7 +260,6 @@
           <div><label>Full Name <input id="pName" required placeholder="Jane Doe"></label></div>
           <div><label>Email <input id="pEmail" type="email" required placeholder="jane@example.com"></label></div>
           <div><label>Phone <input id="pPhone" placeholder="+1 (876) 555‑1234"></label></div>
-          <!-- City removed per request -->
           <div><label>Profile Photo <input id="pPhoto" type="file" accept="image/*"></label></div>
           <div>
             <label>Are you a host?
@@ -257,15 +287,14 @@
             <div><label>Name on ID (exact) <input id="hIdName" placeholder="Jane Doe"></label></div>
             <div><label>ID Image (front/main page) <input id="hIdImage" type="file" accept="image/*"></label></div>
           </div>
-          <p class="small">This demo verifies locally that the <strong>Name on ID</strong> exactly matches your profile <strong>Full Name</strong> and an <strong>ID image</strong> is uploaded.</p>
+          <p class="small">Local verification: <strong>Name on ID</strong> must exactly match your profile <strong>Full Name</strong> and an <strong>ID image</strong> is required.</p>
         </div>
 
         <div id="profileSummary" style="margin-top:10px"></div>
       </div>
       <footer>
-        <!-- Cancel closes dialog without saving -->
         <button id="cancelProfile" type="button" class="btn linklike">Cancel</button>
-        <button id="saveProfileBtn" class="btn">Save</button>
+        <button id="saveProfileBtn" class="btn btn-primary">Save</button>
       </footer>
     </form>
   </dialog>
@@ -302,6 +331,9 @@
       </footer>
     </form>
   </dialog>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite">Profile saved</div>
 
 <script>
 /* ===== Local DB (events) ===== */
@@ -357,6 +389,12 @@ const els = {
   avatarFallback: document.getElementById('avatarFallback'),
   hostBtn: document.getElementById('hostBtn'),
 
+  userChip: document.getElementById('userChip'),
+  userNameChip: document.getElementById('userNameChip'),
+  userDot: document.getElementById('userDot'),
+  hostBadge: document.getElementById('hostBadge'),
+  hostBadgeVerified: document.getElementById('hostBadgeVerified'),
+
   profileDialog: document.getElementById('profileDialog'),
   profileForm: document.getElementById('profileForm'),
   pName: document.getElementById('pName'),
@@ -384,7 +422,9 @@ const els = {
   fPrice: document.getElementById('fPrice'),
   fCover: document.getElementById('fCover'),
   fDesc: document.getElementById('fDesc'),
-  saveEventBtn: document.getElementById('saveEventBtn')
+  saveEventBtn: document.getElementById('saveEventBtn'),
+
+  toast: document.getElementById('toast')
 };
 
 /* ===== Filters: build options from data ===== */
@@ -476,7 +516,6 @@ function render(list){
 
 /* ===== Search & filter wiring ===== */
 els.qTop.addEventListener('input', ()=>{ state.q = els.qTop.value; applyFilters(); });
-
 ['change','input'].forEach(evt=>{
   els.location.addEventListener(evt, ()=>{ state.location = els.location.value; applyFilters(); });
   els.category.addEventListener(evt, ()=>{ state.category = els.category.value; applyFilters(); });
@@ -489,7 +528,6 @@ els.qTop.addEventListener('input', ()=>{ state.q = els.qTop.value; applyFilters(
     state.end = els.end.value; applyFilters();
   });
 });
-
 /* Toggle filter panel */
 els.filterToggle.addEventListener('click', ()=>{
   const open = els.filtersPanel.style.display === 'block';
@@ -508,7 +546,31 @@ els.resetFilters.addEventListener('click', ()=>{
   applyFilters();
 });
 
+/* ===== Toast helper ===== */
+function showToast(msg='Saved'){
+  els.toast.textContent = msg;
+  els.toast.style.display = 'block';
+  setTimeout(()=>{ els.toast.style.display = 'none'; }, 1400);
+}
+
 /* ===== Profile helpers ===== */
+function setHeaderChipFromProfile(p){
+  if (!p){
+    els.userChip.style.display = 'none';
+    return;
+  }
+  els.userChip.style.display = 'inline-flex';
+  els.userNameChip.textContent = p.name || 'User';
+  els.userChip.title = p.email || '';
+  // dot color: green if profile exists, gray otherwise
+  els.userDot.style.background = p.name ? '#22c55e' : '#9aa4b2';
+  // host badges
+  const isHost = !!p.isHost;
+  const verified = !!(p.host && p.host.verified);
+  els.hostBadge.style.display = isHost && !verified ? 'inline-block' : 'none';
+  els.hostBadgeVerified.style.display = verified ? 'inline-block' : 'none';
+}
+
 function setAvatarFromProfile(p){
   const img = els.avatarImg, fb = els.avatarFallback;
   if (p?.photo){
@@ -518,7 +580,9 @@ function setAvatarFromProfile(p){
     fb.textContent = (p?.name ? initialsOf(p.name) : 'U');
   }
   els.hostBtn.style.display = (p?.isHost && p?.host?.verified) ? 'inline-block' : 'none';
+  setHeaderChipFromProfile(p);
 }
+
 function fillProfileForm(p){
   els.pName.value = p?.name || '';
   els.pEmail.value = p?.email || '';
@@ -531,8 +595,8 @@ function fillProfileForm(p){
   els.hIdImage.value = '';
   renderProfileSummary(p);
 }
+
 function renderProfileSummary(p){
-  // Remove generic "Name: -, Email: -, ..." lines. Only show host status if applicable.
   const statusText = p?.isHost ? (p?.host?.verified ? '✅ Host verified (local)' : '⚠️ Host not verified') : '';
   els.profileSummary.innerHTML = statusText
     ? `<p class="small">Status: ${statusText}</p>`
@@ -546,8 +610,7 @@ els.avatarBtn.addEventListener('click', ()=>{
   els.profileDialog.showModal();
 });
 els.cancelProfile.addEventListener('click', ()=>{
-  // simply close without saving
-  els.profileDialog.close();
+  els.profileDialog.close(); // close without saving
 });
 
 /* Host toggle fields */
@@ -555,7 +618,7 @@ els.pIsHost.addEventListener('change', (e)=>{
   els.hostFields.style.display = (e.target.value === 'yes') ? 'block' : 'none';
 });
 
-/* Save profile (with host verification) — works without backend */
+/* Save profile (creates or updates profile) — with local host verification */
 els.saveProfileBtn.addEventListener('click', async (e)=>{
   e.preventDefault();
   const name = els.pName.value.trim();
@@ -569,6 +632,7 @@ els.saveProfileBtn.addEventListener('click', async (e)=>{
 
   const isHost = (els.pIsHost.value === 'yes');
   let host = null, verified = false;
+
   if (isHost){
     const orgName = els.hOrgName.value.trim();
     const idType = els.hIdType.value;
@@ -576,7 +640,7 @@ els.saveProfileBtn.addEventListener('click', async (e)=>{
     const idImgFile = els.hIdImage.files[0];
 
     if (!orgName || !idType || !idName){ alert('Complete all host fields.'); return; }
-    if (!idImgFile){ alert('Upload an ID image.'); return; }
+    if (!idImgFile && !(prev && prev.host && prev.host.idImage)){ alert('Upload an ID image.'); return; }
 
     // Local name verification: exact match required
     if (idName !== name){
@@ -584,7 +648,7 @@ els.saveProfileBtn.addEventListener('click', async (e)=>{
       return;
     }
 
-    const idImage = await fileToDataURL(idImgFile);
+    const idImage = idImgFile ? await fileToDataURL(idImgFile) : (prev?.host?.idImage || '');
     verified = !!idImage && (idName === name);
     host = { orgName, idType, idName, idImage, verified };
   }
@@ -595,10 +659,12 @@ els.saveProfileBtn.addEventListener('click', async (e)=>{
     photo: photoDataUrl,
     isHost, host
   };
-  writeProfile(profile);
-  setAvatarFromProfile(profile);
-  renderProfileSummary(profile);
-  els.profileDialog.close();
+
+  writeProfile(profile);                 // <-- this actually creates/updates the profile
+  setAvatarFromProfile(profile);         // update header avatar + chip
+  renderProfileSummary(profile);         // update modal summary
+  els.profileDialog.close();             // close modal
+  showToast('Profile saved');            // neat confirmation
 });
 
 /* Host dashboard access */
@@ -646,7 +712,7 @@ els.saveEventBtn.addEventListener('click', async (e)=>{
   const all = readDB(); all.push(newEvent); writeDB(all);
   els.hostDialog.close();
   applyFilters();
-  alert('Event posted.');
+  showToast('Event posted');
 });
 
 /* ===== Boot ===== */
