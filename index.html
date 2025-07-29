@@ -5,17 +5,159 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Event Ticketing Platform (Demo)</title>
 <style>
-  body { font-family: Arial, sans-serif; max-width: 800px; margin: 2rem auto; }
-  h2 { border-bottom: 2px solid #444; padding-bottom: 0.3rem; }
-  label { display: block; margin-top: 1rem; }
-  input, select, button, textarea { width: 100%; padding: 0.4rem; margin-top: 0.3rem; box-sizing: border-box; }
-  .section { margin-bottom: 3rem; padding-bottom: 1rem; border-bottom: 1px solid #ccc; }
-  .ticket { border: 1px solid #888; padding: 1rem; margin: 1rem 0; }
-  .qr-code { margin-top: 0.5rem; }
-  .scan-result { margin-top: 0.5rem; font-weight: bold; }
-  button { cursor: pointer; }
-  .small-input { width: 80px; display: inline-block; margin-right: 0.5rem; }
-  .flex-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  /* Reset & Base */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px 60px;
+  line-height: 1.5;
+}
+
+h1 {
+  font-weight: 700;
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #222;
+  letter-spacing: 1px;
+}
+
+h2 {
+  font-weight: 600;
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  border-bottom: 3px solid #4a90e2;
+  padding-bottom: 6px;
+  color: #2c3e50;
+}
+
+/* Sections */
+.section {
+  background: #fff;
+  padding: 25px 30px;
+  margin-bottom: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(34, 60, 80, 0.12);
+}
+
+/* Labels & Inputs */
+label {
+  display: block;
+  font-weight: 600;
+  margin-top: 18px;
+  color: #444;
+  font-size: 1rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+  width: 100%;
+  padding: 12px 15px;
+  margin-top: 6px;
+  font-size: 1rem;
+  border: 2px solid #d1d8e0;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+  font-family: inherit;
+  resize: vertical;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 6px rgba(74, 144, 226, 0.5);
+}
+
+/* Buttons */
+button {
+  margin-top: 24px;
+  padding: 14px 24px;
+  background-color: #4a90e2;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  user-select: none;
+}
+
+button:hover,
+button:focus {
+  background-color: #357abd;
+  outline: none;
+}
+
+/* Ticket Display */
+.ticket {
+  background: #f0f4f8;
+  border-radius: 12px;
+  padding: 18px 24px;
+  margin: 16px 0;
+  box-shadow: inset 0 0 10px rgba(74, 144, 226, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.ticket > div {
+  flex: 1 1 200px;
+}
+
+.ticket strong {
+  color: #2c3e50;
+}
+
+/* Ticket Status */
+.ticket-status {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.ticket-status.valid {
+  color: #27ae60;
+}
+
+.ticket-status.used {
+  color: #e74c3c;
+}
+
+/* QR Code canvas */
+canvas {
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+/* Scan Result */
+.scan-result {
+  margin-top: 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .ticket {
+    flex-direction: column;
+  }
+}
+
 </style>
 </head>
 <body>
