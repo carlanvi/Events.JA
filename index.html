@@ -35,7 +35,7 @@
   }
   .right-actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
 
-  /* Buttons & Avatar */
+  /* Avatar & Host button */
   .avatar-btn{
     width:42px; height:42px; border-radius:50%; border:1px solid rgba(255,255,255,.14);
     background:#0f1527; overflow:hidden; display:inline-flex; align-items:center; justify-content:center;
@@ -43,21 +43,28 @@
   }
   .avatar-img{ width:100%; height:100%; object-fit:cover; display:block; }
   .avatar-fallback{ font-weight:800; letter-spacing:.3px; color:#cfe3ff; }
-  .hostBtn, .filterBtn{
+  .hostBtn{
     padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.08);
     background:linear-gradient(135deg,var(--accent),#3b82f6); color:#fff; font-weight:700; cursor:pointer;
-    box-shadow:0 8px 18px rgba(59,130,246,.35);
+    box-shadow:0 8px 18px rgba(59,130,246,.35); display:none; /* only when verified */
   }
-  .hostBtn{ display:none; } /* shown only if verified host */
-  .hostBtn:hover, .filterBtn:hover{ filter:brightness(1.05); }
+  .hostBtn:hover{ filter:brightness(1.05); }
 
-  /* SEARCH (full-width, below header) */
-  .search-wrap{ margin:10px 0 14px; }
+  /* SEARCH (full-width) with inline filter button on the right */
+  .search-wrap{ position:relative; margin:10px 0 14px; }
   .search-wrap input{
-    width:100%; padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,.12);
+    width:100%; padding:14px 56px 14px 16px; /* extra right padding for button */
+    border-radius:12px; border:1px solid rgba(255,255,255,.12);
     background:#0f1527; color:var(--text); outline:none; font-size:1rem;
   }
   .search-wrap input:focus{ border-color:var(--accent); box-shadow:0 0 0 4px var(--ring); }
+  .filter-insearch{
+    position:absolute; right:6px; top:50%; transform:translateY(-50%);
+    padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.14);
+    background:linear-gradient(135deg,var(--accent),#3b82f6); color:#fff; font-weight:700; cursor:pointer;
+    box-shadow:0 8px 18px rgba(59,130,246,.35);
+  }
+  .filter-insearch:hover{ filter:brightness(1.05); }
 
   /* FILTER PANEL (hidden until opened) */
   .filters-panel{
@@ -125,7 +132,7 @@
     display:flex; justify-content:space-between; align-items:center; gap:8px;
     padding:12px 14px; border-top:1px solid rgba(255,255,255,.06); flex-wrap:wrap;
   }
-  .btn{ padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:#0f1527; color:var(--text); cursor:pointer; }
+  .btn{ padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:#0f1527; color:#var(--text); cursor:pointer; }
   .btn:hover{ border-color:var(--accent); }
   .empty{ border:1px dashed rgba(255,255,255,.14); border-radius:14px; padding:28px; text-align:center; color:var(--muted); margin-top:16px }
 
@@ -138,11 +145,10 @@
   .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   @media (max-width: 640px){ .grid-2{ grid-template-columns:1fr; } }
   .modal input,.modal select,.modal textarea{
-    width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#0b1120; color:var(--text);
+    width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#0b1120; color:#ecf2ff;
   }
   .pill{ padding:6px 10px; border-radius:999px; background:#0b1120; border:1px solid rgba(255,255,255,.08); font-size:.8rem; }
   .linklike{ background:transparent; border:1px dashed rgba(255,255,255,.2); color:#cfe3ff; }
-  .danger{ display:none; } /* removed Clear Profile button per request */
   .small{ font-size:.9rem; color:var(--muted); }
 </style>
 </head>
@@ -160,9 +166,8 @@
       <!-- spacer -->
       <div></div>
 
-      <!-- Right: Filters + Host (only when verified) + Avatar -->
+      <!-- Right: Host (only when verified) + Avatar -->
       <div class="right-actions">
-        <button id="filterToggle" class="filterBtn" title="Show filters">Filters</button>
         <button id="hostBtn" class="hostBtn" title="Host Dashboard">Host Dashboard</button>
         <button id="avatarBtn" class="avatar-btn" title="Your Profile">
           <span id="avatarFallback" class="avatar-fallback">U</span>
@@ -171,9 +176,10 @@
       </div>
     </header>
 
-    <!-- SEARCH (full-width) -->
+    <!-- SEARCH with inline Filters button -->
     <div class="search-wrap">
       <input id="qTop" type="text" placeholder="Search events (title, venue, description)..." />
+      <button id="filterToggle" class="filter-insearch" title="Filters">Filters</button>
     </div>
 
     <!-- FILTER PANEL (hidden until Filters clicked) -->
@@ -223,7 +229,7 @@
           <div><label>Full Name <input id="pName" required placeholder="Jane Doe"></label></div>
           <div><label>Email <input id="pEmail" type="email" required placeholder="jane@example.com"></label></div>
           <div><label>Phone <input id="pPhone" placeholder="+1 (876) 555‑1234"></label></div>
-          <div><label>City <input id="pCity" placeholder="Kingston"></label></div>
+          <!-- City removed per request -->
           <div><label>Profile Photo <input id="pPhoto" type="file" accept="image/*"></label></div>
           <div>
             <label>Are you a host?
@@ -251,7 +257,7 @@
             <div><label>Name on ID (exact) <input id="hIdName" placeholder="Jane Doe"></label></div>
             <div><label>ID Image (front/main page) <input id="hIdImage" type="file" accept="image/*"></label></div>
           </div>
-          <p class="small">We’ll verify locally that <strong>Name on ID</strong> exactly matches your profile <strong>Full Name</strong> and an <strong>ID image</strong> is uploaded. (For real KYC you’ll need a backend.)</p>
+          <p class="small">This demo verifies locally that the <strong>Name on ID</strong> exactly matches your profile <strong>Full Name</strong> and an <strong>ID image</strong> is uploaded.</p>
         </div>
 
         <div id="profileSummary" style="margin-top:10px"></div>
@@ -356,7 +362,6 @@ const els = {
   pName: document.getElementById('pName'),
   pEmail: document.getElementById('pEmail'),
   pPhone: document.getElementById('pPhone'),
-  pCity: document.getElementById('pCity'),
   pPhoto: document.getElementById('pPhoto'),
   pIsHost: document.getElementById('pIsHost'),
   hostFields: document.getElementById('hostFields'),
@@ -384,10 +389,8 @@ const els = {
 
 /* ===== Filters: build options from data ===== */
 function refreshFilterOptions(list){
-  // Location & category placeholders remain; we add unique options
   const locations = Array.from(new Set(list.map(e=>e.location).filter(Boolean))).sort();
   const categories = Array.from(new Set(list.map(e=>e.category).filter(Boolean))).sort();
-
   els.location.innerHTML = `<option value="" selected disabled>Location</option>` + locations.map(l=>`<option>${l}</option>`).join('');
   els.category.innerHTML = `<option value="" selected disabled>Category</option>` + categories.map(c=>`<option>${c}</option>`).join('');
 }
@@ -520,7 +523,6 @@ function fillProfileForm(p){
   els.pName.value = p?.name || '';
   els.pEmail.value = p?.email || '';
   els.pPhone.value = p?.phone || '';
-  els.pCity.value = p?.city || '';
   els.pIsHost.value = p?.isHost ? 'yes' : 'no';
   els.hostFields.style.display = p?.isHost ? 'block' : 'none';
   els.hOrgName.value = p?.host?.orgName || '';
@@ -530,17 +532,11 @@ function fillProfileForm(p){
   renderProfileSummary(p);
 }
 function renderProfileSummary(p){
-  const status = p?.isHost ? (p?.host?.verified ? '✅ Host verified (local)' : '⚠️ Host not verified') : '—';
-  els.profileSummary.innerHTML = `
-    <div style="margin-top:6px;display:flex;gap:10px;flex-wrap:wrap">
-      <span class="pill">Name: ${p?.name || '-'}</span>
-      <span class="pill">Email: ${p?.email || '-'}</span>
-      <span class="pill">City: ${p?.city || '-'}</span>
-      <span class="pill">Host: ${p?.isHost ? 'Yes' : 'No'}</span>
-      ${p?.isHost ? `<span class="pill">Status: ${status}</span>` : ''}
-    </div>
-    <p class="small" style="margin-top:8px">Note: This is a local demo; real verification needs a backend.</p>
-  `;
+  // Remove generic "Name: -, Email: -, ..." lines. Only show host status if applicable.
+  const statusText = p?.isHost ? (p?.host?.verified ? '✅ Host verified (local)' : '⚠️ Host not verified') : '';
+  els.profileSummary.innerHTML = statusText
+    ? `<p class="small">Status: ${statusText}</p>`
+    : `<p class="small">Update your profile if you’d like to host events.</p>`;
 }
 
 /* Profile dialog open/close */
@@ -559,7 +555,7 @@ els.pIsHost.addEventListener('change', (e)=>{
   els.hostFields.style.display = (e.target.value === 'yes') ? 'block' : 'none';
 });
 
-/* Save profile (with host verification) */
+/* Save profile (with host verification) — works without backend */
 els.saveProfileBtn.addEventListener('click', async (e)=>{
   e.preventDefault();
   const name = els.pName.value.trim();
@@ -581,17 +577,23 @@ els.saveProfileBtn.addEventListener('click', async (e)=>{
 
     if (!orgName || !idType || !idName){ alert('Complete all host fields.'); return; }
     if (!idImgFile){ alert('Upload an ID image.'); return; }
-    if (idName !== name){ alert('Name on ID must exactly match your profile Full Name.'); return; }
+
+    // Local name verification: exact match required
+    if (idName !== name){
+      alert('Name on ID must exactly match your profile Full Name.');
+      return;
+    }
 
     const idImage = await fileToDataURL(idImgFile);
     verified = !!idImage && (idName === name);
     host = { orgName, idType, idName, idImage, verified };
   }
 
-  const profile = { name, email,
+  const profile = {
+    name, email,
     phone: els.pPhone.value.trim(),
-    city: els.pCity.value.trim(),
-    photo: photoDataUrl, isHost, host
+    photo: photoDataUrl,
+    isHost, host
   };
   writeProfile(profile);
   setAvatarFromProfile(profile);
@@ -648,7 +650,7 @@ els.saveEventBtn.addEventListener('click', async (e)=>{
 });
 
 /* ===== Boot ===== */
-if (readDB().length === 0) writeDB([]); // keep empty by default
+if (readDB().length === 0) writeDB([]);
 refreshFilterOptions(readDB());
 applyFilters();
 
