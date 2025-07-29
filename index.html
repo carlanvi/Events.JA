@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Event Ticketing Platform (Demo)</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 800px; margin: 2rem auto; }
+  h2 { border-bottom: 2px solid #444; padding-bottom: 0.3rem; }
+  label { display: block; margin-top: 1rem; }
+  input, select, button, textarea { width: 100%; padding: 0.4rem; margin-top: 0.3rem; box-sizing: border-box; }
+  .section { margin-bottom: 3rem; padding-bottom: 1rem; border-bottom: 1px solid #ccc; }
+  .ticket { border: 1px solid #888; padding: 1rem; margin: 1rem 0; }
+  .qr-code { margin-top: 0.5rem; }
+  .scan-result { margin-top: 0.5rem; font-weight: bold; }
+  button { cursor: pointer; }
+  .small-input { width: 80px; display: inline-block; margin-right: 0.5rem; }
+  .flex-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<h1>Event Ticketing Platform Demo</h1>
+
+<div class="section" id="organizer-section">
+  <h2>Step 1: Organizer Payout Account</h2>
+  <label for="organizerName">Organizer Name</label>
+  <input id="organizerName" placeholder="Your Business Name" />
+
+  <label for="organizerAccount">Payout Account (simulated)</label>
+  <input id="organizerAccount" placeholder="Bank Account / Wallet ID" />
+
+  <button id="saveOrganizerBtn">Save Organizer Info</button>
+  <p id="organizerStatus"></p>
+</div>
+
+<div class="section" id="event-section" style="display:none;">
+  <h2>Step 2: Create Event & Tickets</h2>
+  <label for="eventTitle">Event Title</label>
+  <input id="eventTitle" placeholder="Awesome Concert" />
+
+  <label for="eventDescription">Event Description</label>
+  <textarea id="eventDescription" rows="3" placeholder="Describe your event"></textarea>
+
+  <label for="ticketPrice">Ticket Price (JMD)</label>
+  <input id="ticketPrice" type="number" min="1" value="1000" />
+
+  <label for="ticketQuantity">Ticket Quantity</label>
+  <input id="ticketQuantity" type="number" min="1" value="100" />
+
+  <button id="createEventBtn">Create Event</button>
+  <p id="eventStatus"></p>
+</div>
+
+<div class="section" id="buy-section" style="display:none;">
+  <h2>Step 3: Buy Tickets</h2>
+  <div id="eventInfo"></div>
+
+  <label for="buyQuantity">Quantity to Buy</label>
+  <input id="buyQuantity" type="number" min="1" value="1" />
+
+  <p>Ticket Price: <span id="ticketPriceDisplay"></span> JMD</p>
+  <p>Platform Fee (4%): <span id="platformFeeDisplay"></span> JMD</p>
+  <p><strong>Total to Pay: <span id="totalPriceDisplay"></span> JMD</strong></p>
+
+  <button id="buyTicketsBtn">Buy Tickets</button>
+  <p id="buyStatus"></p>
+</div>
+
+<div class="section" id="tickets-section" style="display:none;">
+  <h2>Step 4: Your Tickets</h2>
+  <div id="ticketsList"></div>
+</div>
+
+<div class="section" id="scan-section" style="display:none;">
+  <h2>Step 5: Scan Ticket</h2>
+  <label for="scanSerial">Enter Ticket Serial</label>
+  <input id="scanSerial" placeholder="Ticket Serial" />
+  <button id="scanBtn">Scan</button>
+  <p id="scanResult" class="scan-result"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script>
+(() => {
+  // Data stores (simulate DB)
+  let organizer = null;
+  let event = null;
+  let tickets = [];
+
+  // Helpers
+  function generateSerial() {
+    return Math.random().toString(36).substr(2, 9).toUpperCase();
+  }
+
+  // Organizer Save
+  const organizerNameInput = document.getElementById('organizerName');
+  const organizerAccountInput = document.getElementById('organizerAccount');
+  const saveOrganizerBtn = document.getElementById('saveOrganizerBtn');
+  const organizerStatus = document.getElementById('organizerStatus');
+  const eventSection = document.getElementById('event-section');
+
+  saveOrganizerBtn.onclick = () => {
+    const name = organizerNameInput.value.trim();
+    const account = organizerAccountInput.value.trim();
+    if (!name || !account) {
+      organizerStatus.textContent = 'Please enter both name and payout account.';
+      return;
+    }
+    organizer = { name, account };
+    organizerStatus.textContent = `Organizer info saved. Name: ${name}, Payout Account: ${account}`;
+    eventSection.style.display = 'block';
+  };
+
+  // Event Creation
+  const eventTitleInput = document.getElementById('eventTitle');
+  const eventDescriptionInput = document.getElementById('eventDescription');
+  const ticketPriceInput = document.getElementById('ticketPrice');
+  const ticketQuantityInput = document.getElementById('ticketQuantity');
+  const createEventBtn = document.getElementById('createEventBtn');
+  const eventStatus = document.getElementById('eventStatus');
+  const buySection = document.getElementById('buy-section');
+  const eventInfo = document.getElementById('eventInfo');
+
+  createEventBtn.onclick = () => {
+    const title = eventTitleInput.value.trim();
+    const description = eventDescriptionInput.value.trim();
+    const price = Number(ticketPriceInput.value);
+    const quantity = Number(ticketQuantityInput.value);
+
+    if (!title || !price || price <= 0 || !quantity || quantity <= 0) {
+      eventStatus.textContent = 'Please enter valid event title, ticket price, and quantity.';
+      return;
+    }
+
+    event = { title, description, price, quantity, ticketsSold: 0 };
+    eventStatus.textContent = `Event "${title}" created with ${quantity} tickets at JMD ${price} each.`;
+    eventInfo.innerHTML = `<strong>${title}</strong><br/>${description}<br/>Tickets available: <span id="ticketsAvailable">${quantity}</span>`;
+    updatePriceDisplays();
+    buySection.style.display = 'block';
+  };
+
+  // Buying tickets
+  const buyQuantityInput = document.getElementById('buyQuantity');
+  const ticketPriceDisplay = document.getElementById('ticketPriceDisplay');
+  const platformFeeDisplay = document.getElementById('platformFeeDisplay');
+  const totalPriceDisplay = document.getElementById('totalPriceDisplay');
+  const buyTicketsBtn = document.getElementById('buyTicketsBtn');
+  const buyStatus = document.getElementById('buyStatus');
+  const ticketsSection = document.getElementById('tickets-section');
+  const ticketsList = document.getElementById('ticketsList');
+  const scanSection = document.getElementById('scan-section');
+
+  function updatePriceDisplays() {
+    const qty = Number(buyQuantityInput.value) || 1;
+    if (!event) return;
+    const price = event.price * qty;
+    const fee = Math.ceil(price * 0.04);
+    ticketPriceDisplay.textContent = price.toLocaleString();
+    platformFeeDisplay.textContent = fee.toLocaleString();
+    totalPriceDisplay.textContent = price.toLocaleString(); // Buyer pays ticket price only (Option A)
+  }
+
+  buyQuantityInput.oninput = updatePriceDisplays;
+
+  buyTicketsBtn.onclick = async () => {
+    buyStatus.textContent = '';
+    if (!event) {
+      buyStatus.textContent = 'No event available.';
+      return;
+    }
+    let qty = Number(buyQuantityInput.value);
+    if (!qty || qty <= 0) {
+      buyStatus.textContent = 'Please enter a valid ticket quantity.';
+      return;
+    }
+    if (qty > (event.quantity - event.ticketsSold)) {
+      buyStatus.textContent = `Only ${event.quantity - event.ticketsSold} tickets left.`;
+      return;
+    }
+
+    // Simulate payment processing delay
+    buyStatus.textContent = 'Processing payment...';
+    await new Promise(r => setTimeout(r, 1500));
+
+    // Deduct tickets
+    event.ticketsSold += qty;
+    document.getElementById('ticketsAvailable').textContent = event.quantity - event.ticketsSold;
+
+    // Generate tickets with serial and QR
+    for (let i = 0; i < qty; i++) {
+      const serial = generateSerial();
+      const token = btoa(JSON.stringify({ serial, event: event.title, issued: Date.now() }));
+      tickets.push({ serial, token, used: false });
+    }
+
+    buyStatus.textContent = `Successfully purchased ${qty} ticket(s).`;
+    renderTickets();
+    ticketsSection.style.display = 'block';
+    scanSection.style.display = 'block';
+  };
+
+  // Render tickets
+  function renderTickets() {
+    ticketsList.innerHTML = '';
+    if (tickets.length === 0) {
+      ticketsList.textContent = 'No tickets purchased yet.';
+      return;
+    }
+    tickets.forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'ticket';
+      div.innerHTML = `
+        <div><strong>Ticket Serial:</strong> ${t.serial}</div>
+        <canvas id="qr-${t.serial}"></canvas>
+        <div>Status: <span style="color:${t.used ? 'red' : 'green'}">${t.used ? 'Used' : 'Valid'}</span></div>
+      `;
+      ticketsList.appendChild(div);
+      // Generate QR code
+      QRCode.toCanvas(document.getElementById(`qr-${t.serial}`), t.token, { width: 128 });
+    });
+  }
+
+  // Scan ticket
+  const scanSerialInput = document.getElementById('scanSerial');
+  const scanBtn = document.getElementById('scanBtn');
+  const scanResult = document.getElementById('scanResult');
+
+  scanBtn.onclick = () => {
+    const serial = scanSerialInput.value.trim().toUpperCase();
+    if (!serial) {
+      scanResult.textContent = 'Please enter a ticket serial.';
+      scanResult.style.color = 'red';
+      return;
+    }
+    const ticket = tickets.find(t => t.serial === serial);
+    if (!ticket) {
+      scanResult.textContent = 'Ticket not found.';
+      scanResult.style.color = 'red';
+      return;
+    }
+    if (ticket.used) {
+      scanResult.textContent = `Ticket already used!`;
+      scanResult.style.color = 'red';
+      return;
+    }
+    ticket.used = true;
+    scanResult.textContent = 'Ticket validated. Access granted.';
+    scanResult.style.color = 'green';
+    renderTickets();
+  };
+
+  // Initialize price display
+  buyQuantityInput.value = 1;
+  updatePriceDisplays();
+
+})();
+</script>
+
+</body>
+</html>
