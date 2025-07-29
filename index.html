@@ -184,6 +184,8 @@ dialog{ border:none; border-radius:14px; padding:0; max-width:min(760px, calc(10
   padding:10px 14px; border-radius:10px; box-shadow:0 8px 18px rgba(0,0,0,.35); display:none; z-index:1000;
 }
 
+/* Host page (new) */
+.host-page{ margin-top:10px; }
 </style>
 
 <!-- ✅ Add Tesseract.js for client-side OCR -->
@@ -206,6 +208,7 @@ dialog{ border:none; border-radius:14px; padding:0; max-width:min(760px, calc(10
       </div>
     </header>
 
+    <!-- Search + Filters -->
     <div class="search-wrap">
       <input id="qTop" type="text" placeholder="Search events (title, venue, description)..." />
       <button id="filterToggle" class="filter-insearch">Filters</button>
@@ -229,10 +232,35 @@ dialog{ border:none; border-radius:14px; padding:0; max-width:min(760px, calc(10
       <div id="activeFilters"></div>
     </div>
 
-    <section class="grid" id="grid"></section>
-    <div id="empty" class="empty" style="display:none;border:1px dashed rgba(255,255,255,.14);border-radius:14px;padding:28px;text-align:center;color:#9aa4b2;margin-top:16px">
-      No events match your filters.
+    <!-- ===================== -->
+    <!-- EXPLORE AREA (wrapped) -->
+    <!-- ===================== -->
+    <div id="exploreArea">
+      <section class="grid" id="grid"></section>
+      <div id="empty" class="empty" style="display:none;border:1px dashed rgba(255,255,255,.14);border-radius:14px;padding:28px;text-align:center;color:#9aa4b2;margin-top:16px">
+        No events match your filters.
+      </div>
     </div>
+
+    <!-- ===================== -->
+    <!-- HOST DASHBOARD PAGE   -->
+    <!-- ===================== -->
+    <section id="hostPage" class="host-page" hidden>
+      <header class="host-header" style="display:flex;align-items:center;gap:12px;margin:8px 0 14px">
+        <h2 style="margin:0;font-size:1.25rem">Host Dashboard</h2>
+        <div class="spacer"></div>
+        <button id="backToExplore" class="btn">← Back to Explore</button>
+        <button id="openUploadEvent" class="btn btn-primary">Upload Event</button>
+      </header>
+
+      <div class="meta" style="display:flex;justify-content:space-between;margin:10px 2px 18px;color:#9aa4b2">
+        <div><strong>My Events</strong></div>
+        <div id="myEventsCount"></div>
+      </div>
+
+      <section class="grid" id="myEventsGrid"></section>
+      <div id="myEventsEmpty" class="empty" style="display:none">You haven't uploaded any events yet.</div>
+    </section>
   </div>
 
   <!-- PROFILE -->
@@ -257,7 +285,7 @@ dialog{ border:none; border-radius:14px; padding:0; max-width:min(760px, calc(10
             </div>
           </div>
 
-          <!-- HOST FIELDS (NO 'Name on ID' input anymore) -->
+          <!-- HOST FIELDS -->
           <div id="hostFields" style="margin-top:12px;display:none">
             <hr style="border-color:rgba(255,255,255,.08);border-style:solid;border-width:1px 0 0;margin:6px 0 16px">
             <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -299,16 +327,16 @@ dialog{ border:none; border-radius:14px; padding:0; max-width:min(760px, calc(10
       <footer style="padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;justify-content:flex-end">
         <button id="cancelProfile" type="button" class="btn">Close</button>
         <button id="editProfileBtn" type="button" class="btn" style="display:none">Edit</button>
-        <!-- ✅ Make Save a plain button so dialog doesn't auto-close -->
+        <!-- Save stays a plain button so dialog doesn't auto-close -->
         <button id="saveProfileBtn" type="button" class="btn btn-primary">Save</button>
       </footer>
     </form>
   </dialog>
 
-  <!-- HOST DASHBOARD -->
+  <!-- UPLOAD EVENT DIALOG -->
   <dialog id="hostDialog">
     <form method="dialog" class="modal" id="postForm" style="background:#0f1527;border:1px solid rgba(255,255,255,.06);border-radius:14px;overflow:hidden">
-      <header style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08)"><strong>Host Dashboard — Post Event</strong></header>
+      <header style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08)"><strong>Upload Event</strong></header>
       <div class="body" style="padding:16px 18px">
         <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div><label>Title <input id="fTitle" required placeholder="Event title"></label></div>
@@ -328,9 +356,8 @@ dialog{ border:none; border-radius:14px; padding:0; max-width:min(760px, calc(10
         </div>
       </div>
       <footer style="padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;justify-content:flex-end">
-        <button value="cancel" type="button" class="btn">Close</button>
-        <!-- ✅ Make Save Event a button (not submit) -->
-        <button id="saveEventBtn" type="button" class="btn btn-primary">Save Event</button>
+        <button id="closeHostDialog" type="button" class="btn">Close</button>
+        <button id="uploadEventBtn" type="button" class="btn btn-primary">Upload Event</button>
       </footer>
     </form>
   </dialog>
@@ -365,9 +392,24 @@ const els={
   hOrgName:document.getElementById('hOrgName'), hIdType:document.getElementById('hIdType'), hIdImage:document.getElementById('hIdImage'),
   saveProfileBtn:document.getElementById('saveProfileBtn'), cancelProfile:document.getElementById('cancelProfile'), editProfileBtn:document.getElementById('editProfileBtn'),
   verifyNote:document.getElementById('verifyNote'),
-  hostDialog:document.getElementById('hostDialog'), fTitle:document.getElementById('fTitle'), fCategory:document.getElementById('fCategory'),
+
+  /* New host dashboard elements */
+  exploreArea:document.getElementById('exploreArea'),
+  hostPage:document.getElementById('hostPage'),
+  myEventsGrid:document.getElementById('myEventsGrid'),
+  myEventsEmpty:document.getElementById('myEventsEmpty'),
+  myEventsCount:document.getElementById('myEventsCount'),
+  backToExplore:document.getElementById('backToExplore'),
+  openUploadEvent:document.getElementById('openUploadEvent'),
+
+  /* Upload dialog buttons */
+  hostDialog:document.getElementById('hostDialog'),
+  fTitle:document.getElementById('fTitle'), fCategory:document.getElementById('fCategory'),
   fLocation:document.getElementById('fLocation'), fVenue:document.getElementById('fVenue'), fStart:document.getElementById('fStart'), fEnd:document.getElementById('fEnd'),
-  fPrice:document.getElementById('fPrice'), fCover:document.getElementById('fCover'), fDesc:document.getElementById('fDesc'), saveEventBtn:document.getElementById('saveEventBtn'),
+  fPrice:document.getElementById('fPrice'), fCover:document.getElementById('fCover'), fDesc:document.getElementById('fDesc'),
+  closeHostDialog:document.getElementById('closeHostDialog'),
+  uploadEventBtn:document.getElementById('uploadEventBtn'),
+
   toast:document.getElementById('toast')
 };
 
@@ -380,6 +422,26 @@ function refreshFilterOptions(list){
   els.location.innerHTML=`<option value="" disabled selected>Location</option>${locs.map(l=>`<option>${l}</option>`).join('')}`;
   els.category.innerHTML=`<option value="" disabled selected>Category</option>${cats.map(c=>`<option>${c}</option>`).join('')}`;
 }
+function createEventCard(ev){
+  const card=document.createElement('article');card.className='card';
+  card.innerHTML=`
+    <div class="thumb">${ev.cover?`<img src="${ev.cover}" alt="${ev.title}">`:''}<div class="chip">${ev.category||'Event'}</div></div>
+    <div class="content" style="padding:14px 14px 12px">
+      <h3 class="title" style="margin:0 0 6px">${ev.title}</h3>
+      <div class="muted" style="color:#9aa4b2">${ev.venue||''}${ev.venue?', ':''}${ev.location||''}</div>
+      <div class="row" style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">
+        <span class="badge" style="padding:4px 8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#0f1527">${toLocalDate(ev.startsAt)}</span>
+        ${ev.endsAt?`<span class="badge" style="padding:4px 8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#0f1527">Ends ${toLocalDate(ev.endsAt)}</span>`:''}
+        <span class="badge" style="padding:4px 8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#0f1527">${fmtMoney(ev.priceJMD||0)}</span>
+      </div>
+      ${ev.description?`<p class="muted" style="margin:10px 0 0;color:#9aa4b2">${ev.description}</p>`:''}
+    </div>
+    <div class="footer" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid rgba(255,255,255,.06)">
+      <span class="muted" style="color:#9aa4b2">${new URL(location.href).origin}</span>
+      <button class="btn" onclick="alert('Static demo. Connect checkout later.')">View / Buy</button>
+    </div>`;
+  return card;
+}
 function render(list){
   els.grid.innerHTML='';
   refreshFilterOptions(readDB());
@@ -389,24 +451,7 @@ function render(list){
   els.activeFilters.textContent=chips.join(' • ');
   const frag=document.createDocumentFragment();
   list.sort((a,b)=>new Date(a.startsAt)-new Date(b.startsAt)).forEach(ev=>{
-    const card=document.createElement('article');card.className='card';
-    card.innerHTML=`
-      <div class="thumb">${ev.cover?`<img src="${ev.cover}" alt="${ev.title}">`:''}<div class="chip">${ev.category||'Event'}</div></div>
-      <div class="content" style="padding:14px 14px 12px">
-        <h3 class="title" style="margin:0 0 6px">${ev.title}</h3>
-        <div class="muted" style="color:#9aa4b2">${ev.venue||''}${ev.venue?', ':''}${ev.location||''}</div>
-        <div class="row" style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">
-          <span class="badge" style="padding:4px 8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#0f1527">${toLocalDate(ev.startsAt)}</span>
-          ${ev.endsAt?`<span class="badge" style="padding:4px 8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#0f1527">Ends ${toLocalDate(ev.endsAt)}</span>`:''}
-          <span class="badge" style="padding:4px 8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:#0f1527">${fmtMoney(ev.priceJMD||0)}</span>
-        </div>
-        ${ev.description?`<p class="muted" style="margin:10px 0 0;color:#9aa4b2">${ev.description}</p>`:''}
-      </div>
-      <div class="footer" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid rgba(255,255,255,.06)">
-        <span class="muted" style="color:#9aa4b2">${new URL(location.href).origin}</span>
-        <button class="btn" onclick="alert('Static demo. Connect checkout later.')">View / Buy</button>
-      </div>`;
-    frag.appendChild(card);
+    frag.appendChild(createEventCard(ev));
   });
   els.grid.appendChild(frag);
 }
@@ -457,17 +502,12 @@ els.pIsHost.addEventListener('change',(e)=>{els.hostFields.style.display=(e.targ
 
 /* ===== OCR Host Verification (Tesseract.js) ===== */
 async function ocrContainsName(file, profileName){
-  // Run OCR and check that at least two name tokens (>=3 chars) appear in the text
   const name = normalize(profileName);
   const tokens = name.split(' ').filter(t=>t.length>=3);
   if(tokens.length===0) return false;
 
-  // Tesseract: prefer 'eng'
-  const { data } = await Tesseract.recognize(file, 'eng', { logger: m => {
-      // optional: could update UI via els.verifyNote.textContent = 'Verifying… ' + (m.progress*100|0) + '%';
-  }});
+  const { data } = await Tesseract.recognize(file, 'eng', { logger: m => { /* optionally update UI */ }});
   const text = normalize(data.text);
-  // require all tokens OR at least 2 tokens if many names
   const matches = tokens.filter(t => text.includes(t)).length;
   return (tokens.length <= 2) ? (matches === tokens.length) : (matches >= 2);
 }
@@ -496,10 +536,8 @@ els.saveProfileBtn.addEventListener('click', async ()=>{
 
     try{
       els.verifyNote.textContent = 'Verifying ID… this can take a few seconds.';
-      // If editing and no new file chosen, verify against the stored image dataURL
       const fileForOCR = idFile || prev.host.idImage;
       const fileInputForOCR = idFile ? idFile : await (async ()=>{
-        // reconstruct a Blob from dataURL for Tesseract
         const res = await fetch(prev.host.idImage);
         return await res.blob();
       })();
@@ -529,20 +567,63 @@ els.saveProfileBtn.addEventListener('click', async ()=>{
   writeProfile(profile);
   setAvatarFromProfile(profile);
   renderProfileView(profile);
-  setProfileMode('view');   // hide inputs, show neat profile view
+  setProfileMode('view');
   els.profileDialog.close();
   showToast('Profile saved');
 });
 
-/* ===== Host Dashboard (post event) ===== */
-els.hostBtn.addEventListener('click',()=>{
+/* ===== Host Dashboard page logic ===== */
+function showHostDashboard(){
   const p=readProfile();
-  if(!(p?.isHost && p?.host?.verified)){ alert('You must be a verified host to post events.'); return; }
+  if(!(p?.isHost && p?.host?.verified)){
+    alert('You must be a verified host to access your dashboard.');
+    return;
+  }
+  els.exploreArea.hidden = true;
+  els.hostPage.hidden = false;
+
+  const all = readDB();
+  const myId = p.email || p.name;
+  const mine = all.filter(e => e.hostId === myId).sort((a,b)=>new Date(a.startsAt)-new Date(b.startsAt));
+
+  els.myEventsGrid.innerHTML='';
+  if(mine.length===0){
+    els.myEventsEmpty.style.display='block';
+    els.myEventsCount.textContent='0';
+  }else{
+    els.myEventsEmpty.style.display='none';
+    const frag=document.createDocumentFragment();
+    mine.forEach(ev=>frag.appendChild(createEventCard(ev)));
+    els.myEventsGrid.appendChild(frag);
+    els.myEventsCount.textContent=String(mine.length);
+  }
+}
+function backToExplore(){
+  els.hostPage.hidden = true;
+  els.exploreArea.hidden = false;
+}
+
+/* ===== Upload dialog buttons & flow ===== */
+// Header Host Dashboard button opens the page (not the dialog)
+els.hostBtn.addEventListener('click', showHostDashboard);
+
+// Back to Explore
+els.backToExplore.addEventListener('click', backToExplore);
+
+// From Host Dashboard: open the Upload Event dialog
+els.openUploadEvent.addEventListener('click', ()=>{
+  const p=readProfile();
+  if(!(p?.isHost && p?.host?.verified)){ alert('Only verified hosts can upload events.'); return; }
   els.hostDialog.showModal();
 });
-document.getElementById('saveEventBtn').addEventListener('click', async ()=>{
+
+// Close button in upload dialog
+els.closeHostDialog.addEventListener('click', ()=> els.hostDialog.close());
+
+// Upload Event (was Save Event)
+els.uploadEventBtn.addEventListener('click', async ()=>{
   const p=readProfile();
-  if(!(p?.isHost && p?.host?.verified)){ alert('Only verified hosts can post events.'); return; }
+  if(!(p?.isHost && p?.host?.verified)){ alert('Only verified hosts can upload events.'); return; }
 
   const title=els.fTitle.value.trim(), category=els.fCategory.value.trim(), locationCity=els.fLocation.value.trim(), venue=els.fVenue.value.trim();
   const start=els.fStart.value, end=els.fEnd.value, price=Number(els.fPrice.value||0);
@@ -553,8 +634,17 @@ document.getElementById('saveEventBtn').addEventListener('click', async ()=>{
   const ev={ id:uid(), title, category, location:locationCity, venue,
     startsAt:new Date(start).toISOString(), endsAt:new Date(end).toISOString(),
     priceJMD:price, description:els.fDesc.value||'', cover, hostId:p.email||p.name };
+
   const all=readDB(); all.push(ev); writeDB(all);
-  els.hostDialog.close(); applyFilters(); showToast('Event posted');
+
+  // Clear form (optional)
+  els.fTitle.value=''; els.fCategory.value=''; els.fLocation.value=''; els.fVenue.value='';
+  els.fStart.value=''; els.fEnd.value=''; els.fPrice.value='0'; els.fCover.value=''; els.fDesc.value='';
+
+  els.hostDialog.close();
+  applyFilters();          // refresh explore list
+  showHostDashboard();     // refresh host dashboard list
+  showToast('Event uploaded');
 });
 
 /* ===== Boot ===== */
