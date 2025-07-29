@@ -22,9 +22,9 @@
 
   .container{ max-width:1100px; margin:0 auto; padding:24px 16px; }
 
-  /* HEADER (search on top, no subtitle) */
+  /* HEADER */
   header{
-    display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; margin-bottom:10px;
+    display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; margin-bottom:6px;
   }
   .brand{ display:flex; align-items:center; gap:12px; min-width:0; }
   .logo{ width:40px; height:40px; border-radius:12px;
@@ -33,17 +33,9 @@
   .title-wrap h1{
     font-size:1.2rem; margin:0; letter-spacing:.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
-
-  .top-search{ min-width:0; }
-  .top-search input{
-    width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.08);
-    background:#0f1527; color:var(--text); outline:none; font-size:.98rem;
-  }
-  .top-search input:focus{ border-color:var(--accent); box-shadow:0 0 0 4px var(--ring); }
-
   .right-actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
 
-  /* Avatar & Host button */
+  /* Buttons & Avatar */
   .avatar-btn{
     width:42px; height:42px; border-radius:50%; border:1px solid rgba(255,255,255,.14);
     background:#0f1527; overflow:hidden; display:inline-flex; align-items:center; justify-content:center;
@@ -51,30 +43,53 @@
   }
   .avatar-img{ width:100%; height:100%; object-fit:cover; display:block; }
   .avatar-fallback{ font-weight:800; letter-spacing:.3px; color:#cfe3ff; }
-  .hostBtn{
+  .hostBtn, .filterBtn{
     padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.08);
     background:linear-gradient(135deg,var(--accent),#3b82f6); color:#fff; font-weight:700; cursor:pointer;
-    box-shadow:0 8px 18px rgba(59,130,246,.35); display:none;
+    box-shadow:0 8px 18px rgba(59,130,246,.35);
   }
-  .hostBtn:hover{ filter:brightness(1.05); }
+  .hostBtn{ display:none; } /* shown only if verified host */
+  .hostBtn:hover, .filterBtn:hover{ filter:brightness(1.05); }
 
-  /* FILTER BAR — responsive, wraps instead of overflowing */
-  .bar{
-    display:grid; gap:12px; background:rgba(16,23,42,.7); border:1px solid rgba(255,255,255,.06);
+  /* SEARCH (full-width, below header) */
+  .search-wrap{ margin:10px 0 14px; }
+  .search-wrap input{
+    width:100%; padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,.12);
+    background:#0f1527; color:var(--text); outline:none; font-size:1rem;
+  }
+  .search-wrap input:focus{ border-color:var(--accent); box-shadow:0 0 0 4px var(--ring); }
+
+  /* FILTER PANEL (hidden until opened) */
+  .filters-panel{
+    display:none; /* toggled with JS */
+    margin-bottom:14px;
+    background:rgba(16,23,42,.7); border:1px solid rgba(255,255,255,.06);
     backdrop-filter: blur(6px); padding:14px; border-radius:14px; box-shadow: 0 10px 30px rgba(0,0,0,.25);
   }
-  .filters{ grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
-  .bar select,.bar input,.bar button{
-    width:100%; padding:11px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.08);
+  .filters-grid{
+    display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+  .filters-panel select,.filters-panel input,.filters-panel button{
+    width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
     background:#0f1527; color:var(--text); outline:none; font-size:.95rem;
   }
-  .bar select:focus,.bar input:focus{ border-color:var(--accent); box-shadow:0 0 0 4px var(--ring); }
-  .bar button{ background:#0f1527; border:1px solid rgba(255,255,255,.12); cursor:pointer; }
-  .bar button:hover{ border-color:var(--accent); }
+  .filters-panel select:focus,.filters-panel input:focus{ border-color:var(--accent); box-shadow:0 0 0 4px var(--ring); }
+  .filters-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap; }
+  .btn-secondary{ background:#0f1527; border:1px solid rgba(255,255,255,.16); color:var(--text); cursor:pointer; }
+  .btn-secondary:hover{ border-color:var(--accent); }
+
+  /* Inside-label for date inputs */
+  .field{ position:relative; }
+  .inside-label{
+    pointer-events:none; position:absolute; left:14px; top:50%; transform:translateY(-50%);
+    color:var(--muted); font-size:.92rem; opacity:.9;
+  }
+  .field input[type="date"]:focus + .inside-label,
+  .field input[type="date"].has-value + .inside-label{ display:none; }
 
   .meta{
     display:flex; justify-content:space-between; align-items:center; gap:10px;
-    margin:18px 2px; color:var(--muted); font-size:.92rem; flex-wrap:wrap;
+    margin:10px 2px 18px; color:var(--muted); font-size:.92rem; flex-wrap:wrap;
   }
 
   /* GRID */
@@ -123,33 +138,31 @@
   .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   @media (max-width: 640px){ .grid-2{ grid-template-columns:1fr; } }
   .modal input,.modal select,.modal textarea{
-    width:100%; padding:11px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:#0b1120; color:var(--text);
+    width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#0b1120; color:var(--text);
   }
   .pill{ padding:6px 10px; border-radius:999px; background:#0b1120; border:1px solid rgba(255,255,255,.08); font-size:.8rem; }
-  .danger{ background:linear-gradient(135deg,#ef4444,#dc2626)!important; color:#fff; border:none; }
   .linklike{ background:transparent; border:1px dashed rgba(255,255,255,.2); color:#cfe3ff; }
+  .danger{ display:none; } /* removed Clear Profile button per request */
   .small{ font-size:.9rem; color:var(--muted); }
 </style>
 </head>
 <body>
   <div class="container">
-    <!-- HEADER (search on top) -->
+    <!-- HEADER -->
     <header>
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
         <div class="title-wrap">
           <h1>Discover Events</h1>
-          <!-- subtitle removed per request -->
         </div>
       </div>
 
-      <!-- Top search input -->
-      <div class="top-search">
-        <input id="qTop" type="text" placeholder="Search events (title, venue, description)..." />
-      </div>
+      <!-- spacer -->
+      <div></div>
 
-      <!-- Right: host button (only when verified) + avatar -->
+      <!-- Right: Filters + Host (only when verified) + Avatar -->
       <div class="right-actions">
+        <button id="filterToggle" class="filterBtn" title="Show filters">Filters</button>
         <button id="hostBtn" class="hostBtn" title="Host Dashboard">Host Dashboard</button>
         <button id="avatarBtn" class="avatar-btn" title="Your Profile">
           <span id="avatarFallback" class="avatar-fallback">U</span>
@@ -158,14 +171,38 @@
       </div>
     </header>
 
-    <!-- FILTER BAR (events always visible; filters just narrow results) -->
-    <div class="bar filters" id="filters">
-      <select id="location"></select>
-      <select id="category"></select>
-      <input id="start" type="date" />
-      <input id="end" type="date" />
-      <button id="clear">Clear</button>
+    <!-- SEARCH (full-width) -->
+    <div class="search-wrap">
+      <input id="qTop" type="text" placeholder="Search events (title, venue, description)..." />
     </div>
+
+    <!-- FILTER PANEL (hidden until Filters clicked) -->
+    <section id="filtersPanel" class="filters-panel" aria-hidden="true">
+      <div class="filters-grid">
+        <select id="location" aria-label="Location">
+          <option value="" selected disabled>Location</option>
+          <!-- options populated from data -->
+        </select>
+
+        <select id="category" aria-label="Category">
+          <option value="" selected disabled>Category</option>
+          <!-- options populated from data -->
+        </select>
+
+        <div class="field">
+          <input id="start" type="date" aria-label="Start date" />
+          <span class="inside-label">Start date</span>
+        </div>
+        <div class="field">
+          <input id="end" type="date" aria-label="End date" />
+          <span class="inside-label">End date</span>
+        </div>
+      </div>
+      <div class="filters-actions">
+        <button id="resetFilters" class="btn-secondary" type="button">Reset Filters</button>
+        <button id="closeFilters" class="btn-secondary" type="button">Close</button>
+      </div>
+    </section>
 
     <div class="meta">
       <div id="count">0 events</div>
@@ -220,8 +257,8 @@
         <div id="profileSummary" style="margin-top:10px"></div>
       </div>
       <footer>
-        <button type="button" id="logoutBtn" class="btn danger" style="margin-right:auto">Clear Profile</button>
-        <button value="cancel" class="btn linklike">Close</button>
+        <!-- Cancel closes dialog without saving -->
+        <button id="cancelProfile" type="button" class="btn linklike">Cancel</button>
         <button id="saveProfileBtn" class="btn">Save</button>
       </footer>
     </form>
@@ -270,7 +307,6 @@ const writeDB = (list) => localStorage.setItem(DB_KEY, JSON.stringify(list));
 const PROFILE_KEY = 'profile_v1';
 const readProfile = () => JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
 const writeProfile = (p) => localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
-const clearProfile = () => localStorage.removeItem(PROFILE_KEY);
 
 /* ===== Utilities ===== */
 const uid = () => Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,6);
@@ -291,7 +327,7 @@ const fileToDataURL = (file) => new Promise((resolve,reject)=>{
 const initialsOf = (name='') => name.trim().split(/\s+/).map(s=>s[0]?.toUpperCase()).slice(0,2).join('') || 'U';
 
 /* ===== Elements & State ===== */
-let state = { q:"", location:"All", category:"All", start:"", end:"" };
+let state = { q:"", location:"", category:"", start:"", end:"" };
 
 const els = {
   grid: document.getElementById('grid'),
@@ -300,11 +336,15 @@ const els = {
   activeFilters: document.getElementById('activeFilters'),
 
   qTop: document.getElementById('qTop'),
+  filterToggle: document.getElementById('filterToggle'),
+  filtersPanel: document.getElementById('filtersPanel'),
+  closeFilters: document.getElementById('closeFilters'),
+  resetFilters: document.getElementById('resetFilters'),
+
   location: document.getElementById('location'),
   category: document.getElementById('category'),
   start: document.getElementById('start'),
   end: document.getElementById('end'),
-  clear: document.getElementById('clear'),
 
   avatarBtn: document.getElementById('avatarBtn'),
   avatarImg: document.getElementById('avatarImg'),
@@ -325,7 +365,7 @@ const els = {
   hIdName: document.getElementById('hIdName'),
   hIdImage: document.getElementById('hIdImage'),
   saveProfileBtn: document.getElementById('saveProfileBtn'),
-  logoutBtn: document.getElementById('logoutBtn'),
+  cancelProfile: document.getElementById('cancelProfile'),
   profileSummary: document.getElementById('profileSummary'),
 
   hostDialog: document.getElementById('hostDialog'),
@@ -342,15 +382,17 @@ const els = {
   saveEventBtn: document.getElementById('saveEventBtn')
 };
 
-/* ===== Filters: build from data ===== */
+/* ===== Filters: build options from data ===== */
 function refreshFilterOptions(list){
+  // Location & category placeholders remain; we add unique options
   const locations = Array.from(new Set(list.map(e=>e.location).filter(Boolean))).sort();
   const categories = Array.from(new Set(list.map(e=>e.category).filter(Boolean))).sort();
-  els.location.innerHTML = `<option value="All">All locations</option>` + locations.map(l=>`<option>${l}</option>`).join('');
-  els.category.innerHTML = `<option value="All">All categories</option>` + categories.map(c=>`<option>${c}</option>`).join('');
+
+  els.location.innerHTML = `<option value="" selected disabled>Location</option>` + locations.map(l=>`<option>${l}</option>`).join('');
+  els.category.innerHTML = `<option value="" selected disabled>Category</option>` + categories.map(c=>`<option>${c}</option>`).join('');
 }
 
-/* ===== Render events (always show, then narrow if filters used) ===== */
+/* ===== Render events (always show; narrow if filters set) ===== */
 function applyFilters(){
   let results = readDB(); // all events by default
 
@@ -362,10 +404,10 @@ function applyFilters(){
       (e.description||"").toLowerCase().includes(q)
     );
   }
-  if (state.location !== "All"){
+  if (state.location){
     results = results.filter(e => e.location === state.location);
   }
-  if (state.category !== "All"){
+  if (state.category){
     results = results.filter(e => e.category === state.category);
   }
   if (state.start){
@@ -394,8 +436,8 @@ function render(list){
 
   const chips = [];
   if (state.q) chips.push(`Search: “${state.q}”`);
-  if (state.location!=="All") chips.push(state.location);
-  if (state.category!=="All") chips.push(state.category);
+  if (state.location) chips.push(state.location);
+  if (state.category) chips.push(state.category);
   if (state.start) chips.push(`From ${state.start}`);
   if (state.end) chips.push(`To ${state.end}`);
   els.activeFilters.textContent = chips.join(' • ');
@@ -429,17 +471,37 @@ function render(list){
   els.grid.appendChild(frag);
 }
 
-/* ===== Search & filters wiring ===== */
+/* ===== Search & filter wiring ===== */
 els.qTop.addEventListener('input', ()=>{ state.q = els.qTop.value; applyFilters(); });
+
 ['change','input'].forEach(evt=>{
   els.location.addEventListener(evt, ()=>{ state.location = els.location.value; applyFilters(); });
   els.category.addEventListener(evt, ()=>{ state.category = els.category.value; applyFilters(); });
-  els.start.addEventListener(evt, ()=>{ state.start = els.start.value; applyFilters(); });
-  els.end.addEventListener(evt, ()=>{ state.end = els.end.value; applyFilters(); });
+  els.start.addEventListener(evt, ()=>{
+    els.start.classList.toggle('has-value', !!els.start.value);
+    state.start = els.start.value; applyFilters();
+  });
+  els.end.addEventListener(evt, ()=>{
+    els.end.classList.toggle('has-value', !!els.end.value);
+    state.end = els.end.value; applyFilters();
+  });
 });
-els.clear.addEventListener('click', ()=>{
-  state = { q:"", location:"All", category:"All", start:"", end:"" };
-  els.qTop.value = ''; els.location.value = 'All'; els.category.value = 'All'; els.start.value = ''; els.end.value = '';
+
+/* Toggle filter panel */
+els.filterToggle.addEventListener('click', ()=>{
+  const open = els.filtersPanel.style.display === 'block';
+  els.filtersPanel.style.display = open ? 'none' : 'block';
+  els.filtersPanel.setAttribute('aria-hidden', open ? 'true' : 'false');
+});
+els.closeFilters.addEventListener('click', ()=>{
+  els.filtersPanel.style.display = 'none';
+  els.filtersPanel.setAttribute('aria-hidden', 'true');
+});
+els.resetFilters.addEventListener('click', ()=>{
+  state = { q: els.qTop.value || "", location:"", category:"", start:"", end:"" };
+  els.location.value = ""; els.category.value = "";
+  els.start.value = ""; els.end.value = "";
+  els.start.classList.remove('has-value'); els.end.classList.remove('has-value');
   applyFilters();
 });
 
@@ -450,29 +512,26 @@ function setAvatarFromProfile(p){
     img.src = p.photo; img.style.display='block'; fb.style.display='none';
   } else {
     img.style.display='none'; fb.style.display='inline-flex';
-    fb.textContent = initialsOf(p?.name || 'User');
+    fb.textContent = (p?.name ? initialsOf(p.name) : 'U');
   }
-  // show host button only if verified host
-  const showHost = !!(p?.isHost && p?.host?.verified);
-  els.hostBtn.style.display = showHost ? 'inline-block' : 'none';
+  els.hostBtn.style.display = (p?.isHost && p?.host?.verified) ? 'inline-block' : 'none';
 }
-
 function fillProfileForm(p){
-  document.getElementById('pName').value = p?.name || '';
-  document.getElementById('pEmail').value = p?.email || '';
-  document.getElementById('pPhone').value = p?.phone || '';
-  document.getElementById('pCity').value = p?.city || '';
-  document.getElementById('pIsHost').value = p?.isHost ? 'yes' : 'no';
-  document.getElementById('hostFields').style.display = p?.isHost ? 'block' : 'none';
-  document.getElementById('hOrgName').value = p?.host?.orgName || '';
-  document.getElementById('hIdType').value = p?.host?.idType || '';
-  document.getElementById('hIdName').value = p?.host?.idName || '';
-  document.getElementById('hIdImage').value = ''; // never persist file input
+  els.pName.value = p?.name || '';
+  els.pEmail.value = p?.email || '';
+  els.pPhone.value = p?.phone || '';
+  els.pCity.value = p?.city || '';
+  els.pIsHost.value = p?.isHost ? 'yes' : 'no';
+  els.hostFields.style.display = p?.isHost ? 'block' : 'none';
+  els.hOrgName.value = p?.host?.orgName || '';
+  els.hIdType.value = p?.host?.idType || '';
+  els.hIdName.value = p?.host?.idName || '';
+  els.hIdImage.value = '';
   renderProfileSummary(p);
 }
 function renderProfileSummary(p){
   const status = p?.isHost ? (p?.host?.verified ? '✅ Host verified (local)' : '⚠️ Host not verified') : '—';
-  document.getElementById('profileSummary').innerHTML = `
+  els.profileSummary.innerHTML = `
     <div style="margin-top:6px;display:flex;gap:10px;flex-wrap:wrap">
       <span class="pill">Name: ${p?.name || '-'}</span>
       <span class="pill">Email: ${p?.email || '-'}</span>
@@ -484,45 +543,41 @@ function renderProfileSummary(p){
   `;
 }
 
-/* ===== Open dialogs ===== */
+/* Profile dialog open/close */
 els.avatarBtn.addEventListener('click', ()=>{
   const p = readProfile();
   fillProfileForm(p);
-  document.getElementById('profileDialog').showModal();
+  els.profileDialog.showModal();
 });
-els.hostBtn.addEventListener('click', ()=>{
-  const p = readProfile();
-  if (!(p?.isHost && p?.host?.verified)) {
-    alert('You must be a verified host to post events.');
-    return;
-  }
-  document.getElementById('hostDialog').showModal();
+els.cancelProfile.addEventListener('click', ()=>{
+  // simply close without saving
+  els.profileDialog.close();
 });
 
-/* ===== Host toggle ===== */
-document.getElementById('pIsHost').addEventListener('change', (e)=>{
-  document.getElementById('hostFields').style.display = (e.target.value === 'yes') ? 'block' : 'none';
+/* Host toggle fields */
+els.pIsHost.addEventListener('change', (e)=>{
+  els.hostFields.style.display = (e.target.value === 'yes') ? 'block' : 'none';
 });
 
-/* ===== Save profile (with host verification) ===== */
-document.getElementById('saveProfileBtn').addEventListener('click', async (e)=>{
+/* Save profile (with host verification) */
+els.saveProfileBtn.addEventListener('click', async (e)=>{
   e.preventDefault();
-  const name = document.getElementById('pName').value.trim();
-  const email = document.getElementById('pEmail').value.trim();
+  const name = els.pName.value.trim();
+  const email = els.pEmail.value.trim();
   if (!name || !email){ alert('Please enter your name and email.'); return; }
 
   const prev = readProfile();
   let photoDataUrl = prev?.photo || '';
-  const photoFile = document.getElementById('pPhoto').files[0];
+  const photoFile = els.pPhoto.files[0];
   if (photoFile){ photoDataUrl = await fileToDataURL(photoFile); }
 
-  const isHost = (document.getElementById('pIsHost').value === 'yes');
+  const isHost = (els.pIsHost.value === 'yes');
   let host = null, verified = false;
   if (isHost){
-    const orgName = document.getElementById('hOrgName').value.trim();
-    const idType = document.getElementById('hIdType').value;
-    const idName = document.getElementById('hIdName').value.trim();
-    const idImgFile = document.getElementById('hIdImage').files[0];
+    const orgName = els.hOrgName.value.trim();
+    const idType = els.hIdType.value;
+    const idName = els.hIdName.value.trim();
+    const idImgFile = els.hIdImage.files[0];
 
     if (!orgName || !idType || !idName){ alert('Complete all host fields.'); return; }
     if (!idImgFile){ alert('Upload an ID image.'); return; }
@@ -534,32 +589,28 @@ document.getElementById('saveProfileBtn').addEventListener('click', async (e)=>{
   }
 
   const profile = { name, email,
-    phone: document.getElementById('pPhone').value.trim(),
-    city: document.getElementById('pCity').value.trim(),
+    phone: els.pPhone.value.trim(),
+    city: els.pCity.value.trim(),
     photo: photoDataUrl, isHost, host
   };
   writeProfile(profile);
   setAvatarFromProfile(profile);
   renderProfileSummary(profile);
-  document.getElementById('profileDialog').close();
-
-  if (profile.isHost && profile.host?.verified){
-    document.getElementById('hostBtn').style.display = 'inline-block';
-  }
+  els.profileDialog.close();
 });
 
-/* ===== Clear profile ===== */
-document.getElementById('logoutBtn').addEventListener('click', ()=>{
-  if (confirm('Clear your saved profile from this browser?')){
-    clearProfile();
-    setAvatarFromProfile(null);
-    document.getElementById('profileDialog').close();
-    alert('Profile cleared.');
+/* Host dashboard access */
+els.hostBtn.addEventListener('click', ()=>{
+  const p = readProfile();
+  if (!(p?.isHost && p?.host?.verified)) {
+    alert('You must be a verified host to post events.');
+    return;
   }
+  els.hostDialog.showModal();
 });
 
-/* ===== Save Event (Host Dashboard) ===== */
-document.getElementById('saveEventBtn').addEventListener('click', async (e)=>{
+/* Save Event (Host Dashboard) */
+els.saveEventBtn.addEventListener('click', async (e)=>{
   e.preventDefault();
   const p = readProfile();
   if (!(p?.isHost && p?.host?.verified)){
@@ -591,16 +642,18 @@ document.getElementById('saveEventBtn').addEventListener('click', async (e)=>{
     hostId: p.email || p.name
   };
   const all = readDB(); all.push(newEvent); writeDB(all);
-  document.getElementById('hostDialog').close();
+  els.hostDialog.close();
   applyFilters();
   alert('Event posted.');
 });
 
 /* ===== Boot ===== */
-if (readDB().length === 0) writeDB([]);
+if (readDB().length === 0) writeDB([]); // keep empty by default
 refreshFilterOptions(readDB());
 applyFilters();
-setAvatarFromProfile(readProfile());
+
+const prof = readProfile();
+if (prof) setAvatarFromProfile(prof);
 </script>
 </body>
 </html>
