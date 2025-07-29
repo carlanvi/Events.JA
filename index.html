@@ -1,403 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Event Ticketing Platform (Demo)</title>
+<title>Events — Discover & Post</title>
+<meta name="description" content="Discover events. Post your own. Filter by location, date & category." />
+
 <style>
-  /* Reset & Base */
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f5f7fa;
-  color: #333;
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 0 20px 60px;
-  line-height: 1.5;
-}
-
-h1 {
-  font-weight: 700;
-  font-size: 2.5rem;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: #222;
-  letter-spacing: 1px;
-}
-
-h2 {
-  font-weight: 600;
-  font-size: 1.6rem;
-  margin-bottom: 1rem;
-  border-bottom: 3px solid #4a90e2;
-  padding-bottom: 6px;
-  color: #2c3e50;
-}
-
-/* Sections */
-.section {
-  background: #fff;
-  padding: 25px 30px;
-  margin-bottom: 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 18px rgba(34, 60, 80, 0.12);
-}
-
-/* Labels & Inputs */
-label {
-  display: block;
-  font-weight: 600;
-  margin-top: 18px;
-  color: #444;
-  font-size: 1rem;
-  cursor: pointer;
-  user-select: none;
-}
-
-input[type="text"],
-input[type="number"],
-textarea {
-  width: 100%;
-  padding: 12px 15px;
-  margin-top: 6px;
-  font-size: 1rem;
-  border: 2px solid #d1d8e0;
-  border-radius: 8px;
-  transition: border-color 0.3s ease;
-  font-family: inherit;
-  resize: vertical;
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus,
-textarea:focus {
-  outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 6px rgba(74, 144, 226, 0.5);
-}
-
-/* Buttons */
-button {
-  margin-top: 24px;
-  padding: 14px 24px;
-  background-color: #4a90e2;
-  border: none;
-  border-radius: 10px;
-  color: white;
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: background-color 0.25s ease;
-  user-select: none;
-}
-
-button:hover,
-button:focus {
-  background-color: #357abd;
-  outline: none;
-}
-
-/* Ticket Display */
-.ticket {
-  background: #f0f4f8;
-  border-radius: 12px;
-  padding: 18px 24px;
-  margin: 16px 0;
-  box-shadow: inset 0 0 10px rgba(74, 144, 226, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.ticket > div {
-  flex: 1 1 200px;
-}
-
-.ticket strong {
-  color: #2c3e50;
-}
-
-/* Ticket Status */
-.ticket-status {
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-.ticket-status.valid {
-  color: #27ae60;
-}
-
-.ticket-status.used {
-  color: #e74c3c;
-}
-
-/* QR Code canvas */
-canvas {
-  border-radius: 8px;
-  background: white;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-}
-
-/* Scan Result */
-.scan-result {
-  margin-top: 12px;
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  .ticket {
-    flex-direction: column;
+  :root{
+    --bg:#0b1020; --card:#10172a; --muted:#9aa4b2; --text:#ecf2ff; --accent:#5ca0ff; --accent-2:#9bffd1; --ring: rgba(92,160,255,.45);
   }
-}
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background: radial-gradient(1200px 600px at 80% -10%, #14203d 0%, #0b1020 60%), var(--bg); color:var(--text)}
+  .container{max-width:1100px;margin:0 auto;padding:24px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 6px 18px rgba(92,160,255,.35)}
+  h1{font-size:1.1rem;margin:0;letter-spacing:.3px}
+  .sub{color:var(--muted);font-size:.85rem;margin:2px 0 0}
 
+  /* Controls */
+  .bar{display:grid;gap:12px;background:rgba(16,23,42,.7);border:1px solid rgba(255,255,255,.06);backdrop-filter: blur(6px);padding:14px;border-radius:14px;box-shadow: 0 10px 30px rgba(0,0,0,.25)}
+  .filters{grid-template-columns: 1fr 180px 160px 160px 150px}
+  .actions{grid-template-columns: 1fr 1fr 1fr}
+  .bar input,.bar select,.bar button{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#0f1527;color:var(--text);outline:none;font-size:.95rem;transition:border-color .15s, box-shadow .15s}
+  .bar input:focus,.bar select:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--ring)}
+  .bar button{background:linear-gradient(135deg,var(--accent),#3b82f6);border:none;font-weight:700;cursor:pointer;box-shadow:0 8px 18px rgba(59,130,246,.35)}
+  .bar button:hover{filter:brightness(1.05)}
+  @media (max-width: 980px){ .filters{grid-template-columns: 1fr 1fr 1fr 1fr 120px} .actions{grid-template-columns:1fr 1fr} }
+  @media (max-width: 640px){ .filters{grid-template-columns: 1fr 1fr} .filters .wide{grid-column: 1/-1} }
+
+  .meta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:18px 2px;color:var(--muted);font-size:.92rem}
+
+  /* Grid */
+  .grid{display:grid;grid-template-columns: repeat(3, minmax(0,1fr));gap:16px}
+  @media (max-width: 980px){ .grid{ grid-template-columns: repeat(2, 1fr);} }
+  @media (max-width: 640px){ .grid{ grid-template-columns: 1fr;} }
+
+  .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));border: 1px solid rgba(255,255,255,.06);border-radius:16px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.35);display:flex;flex-direction:column}
+  .thumb{position:relative;height:170px;overflow:hidden;background:#0f162e}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block;opacity:.95;transform:scale(1.02)}
+  .chip{position:absolute;left:10px;top:10px;padding:6px 10px;border-radius:999px;background:rgba(12, 215, 172, .15);color:#9bffd1;font-weight:700;font-size:.75rem;letter-spacing:.3px;border:1px solid rgba(155,255,209,.25)}
+  .content{padding:14px 14px 12px}
+  .title{font-weight:800;margin:0 0 6px;font-size:1.05rem;letter-spacing:.2px}
+  .muted{color:var(--muted);font-size:.92rem}
+  .row{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+  .badge{padding:4px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#0f1527;color:#cdd7e6;font-size:.78rem}
+  .footer{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-top:1px solid rgba(255,255,255,.06)}
+  .btn{padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#0f1527;color:var(--text);cursor:pointer}
+  .btn:hover{border-color:var(--accent)}
+  .empty{border:1px dashed rgba(255,255,255,.14);border-radius:14px;padding:28px;text-align:center;color:var(--muted);margin-top:16px}
+
+  /* Modal */
+  dialog{border:none;border-radius:14px;padding:0;max-width:720px;width:95%}
+  .modal{background:#0f1527;color:var(--text);border:1px solid rgba(255,255,255,.06);border-radius:14px;overflow:hidden}
+  .modal header{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .modal .body{padding:16px 18px}
+  .modal footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;justify-content:flex-end}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width: 640px){ .grid-2{grid-template-columns:1fr} }
+  .modal input,.modal select,.modal textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#0b1120;color:var(--text)}
+  .pill{padding:6px 10px;border-radius:999px;background:#0b1120;border:1px solid rgba(255,255,255,.08);font-size:.8rem}
+  .danger{background:linear-gradient(135deg,#ef4444,#dc2626)!important}
+  .linklike{background:transparent;border:1px dashed rgba(255,255,255,.2);color:#cfe3ff}
 </style>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Discover Events</h1>
+          <p class="sub">Browse. Filter. Post your own (saved to your browser or export to share).</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button id="openPost" class="btn">+ Post Event</button>
+        <button id="exportBtn" class="btn">Export</button>
+        <label class="btn" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer">
+          Import <input id="importFile" type="file" accept="application/json" style="display:none">
+        </label>
+      </div>
+    </header>
 
-<h1>Event Ticketing Platform Demo</h1>
+    <!-- FILTER BAR -->
+    <div class="bar filters" id="filters">
+      <input class="wide" id="q" type="text" placeholder="Search events (title, venue, description)..." />
+      <select id="location"></select>
+      <select id="category"></select>
+      <input id="start" type="date" />
+      <input id="end" type="date" />
+      <button id="clear">Clear</button>
+    </div>
 
-<div class="section" id="organizer-section">
-  <h2>Step 1: Organizer Payout Account</h2>
-  <label for="organizerName">Organizer Name</label>
-  <input id="organizerName" placeholder="Your Business Name" />
+    <div class="meta">
+      <div id="count">0 events</div>
+      <div id="activeFilters"></div>
+    </div>
 
-  <label for="organizerAccount">Payout Account (simulated)</label>
-  <input id="organizerAccount" placeholder="Bank Account / Wallet ID" />
+    <!-- GRID -->
+    <section class="grid" id="grid"></section>
+    <div id="empty" class="empty" style="display:none;">No events match your filters.</div>
+  </div>
 
-  <button id="saveOrganizerBtn">Save Organizer Info</button>
-  <p id="organizerStatus"></p>
-</div>
+  <!-- POST EVENT MODAL -->
+  <dialog id="postDialog">
+    <form method="dialog" class="modal" id="postForm">
+      <header><strong>Post a New Event</strong></header>
+      <div class="body">
+        <div class="grid-2">
+          <div>
+            <label>Title
+              <input id="fTitle" required placeholder="Event title">
+            </label>
+          </div>
+          <div>
+            <label>Category
+              <select id="fCategory" required>
+                <option value="">Select…</option>
+                <option>Music</option>
+                <option>Food & Drink</option>
+                <option>Sports</option>
+                <option>Business</option>
+                <option>Culture</option>
+                <option>Family</option>
+                <option>Nightlife</option>
+              </select>
+            </label>
+          </div>
 
-<div class="section" id="event-section" style="display:none;">
-  <h2>Step 2: Create Event & Tickets</h2>
-  <label for="eventTitle">Event Title</label>
-  <input id="eventTitle" placeholder="Awesome Concert" />
+          <div>
+            <label>Location (City/Town)
+              <input id="fLocation" required placeholder="Kingston">
+            </label>
+          </div>
+          <div>
+            <label>Venue
+              <input id="fVenue" required placeholder="National Stadium">
+            </label>
+          </div>
 
-  <label for="eventDescription">Event Description</label>
-  <textarea id="eventDescription" rows="3" placeholder="Describe your event"></textarea>
+          <div>
+            <label>Start Date & Time
+              <input id="fStart" type="datetime-local" required>
+            </label>
+          </div>
+          <div>
+            <label>End Date & Time
+              <input id="fEnd" type="datetime-local" required>
+            </label>
+          </div>
 
-  <label for="ticketPrice">Ticket Price (JMD)</label>
-  <input id="ticketPrice" type="number" min="1" value="1000" />
+          <div>
+            <label>Ticket Price (JMD)
+              <input id="fPrice" type="number" min="0" step="1" value="0" required>
+            </label>
+          </div>
+          <div>
+            <label>Cover Image
+              <input id="fCover" type="file" accept="image/*">
+            </label>
+          </div>
 
-  <label for="ticketQuantity">Ticket Quantity</label>
-  <input id="ticketQuantity" type="number" min="1" value="100" />
+          <div style="grid-column:1/-1">
+            <label>Description
+              <textarea id="fDesc" rows="4" placeholder="Describe your event"></textarea>
+            </label>
+          </div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+          <span class="pill">No login required (demo)</span>
+          <span class="pill">Saved locally</span>
+          <span class="pill">Use Export/Import to share</span>
+        </div>
+      </div>
+      <footer>
+        <button value="cancel" class="btn linklike">Cancel</button>
+        <button id="saveEventBtn" class="btn">Save Event</button>
+      </footer>
+    </form>
+  </dialog>
 
-  <button id="createEventBtn">Create Event</button>
-  <p id="eventStatus"></p>
-</div>
-
-<div class="section" id="buy-section" style="display:none;">
-  <h2>Step 3: Buy Tickets</h2>
-  <div id="eventInfo"></div>
-
-  <label for="buyQuantity">Quantity to Buy</label>
-  <input id="buyQuantity" type="number" min="1" value="1" />
-
-  <p>Ticket Price: <span id="ticketPriceDisplay"></span> JMD</p>
-  <p>Platform Fee (4%): <span id="platformFeeDisplay"></span> JMD</p>
-  <p><strong>Total to Pay: <span id="totalPriceDisplay"></span> JMD</strong></p>
-
-  <button id="buyTicketsBtn">Buy Tickets</button>
-  <p id="buyStatus"></p>
-</div>
-
-<div class="section" id="tickets-section" style="display:none;">
-  <h2>Step 4: Your Tickets</h2>
-  <div id="ticketsList"></div>
-</div>
-
-<div class="section" id="scan-section" style="display:none;">
-  <h2>Step 5: Scan Ticket</h2>
-  <label for="scanSerial">Enter Ticket Serial</label>
-  <input id="scanSerial" placeholder="Ticket Serial" />
-  <button id="scanBtn">Scan</button>
-  <p id="scanResult" class="scan-result"></p>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <script>
-(() => {
-  // Data stores (simulate DB)
-  let organizer = null;
-  let event = null;
-  let tickets = [];
+/* ===== Simple local "db" ===== */
+const DB_KEY = 'events_v1';
+const readDB = () => JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+const writeDB = (list) => localStorage.setItem(DB_KEY, JSON.stringify(list));
 
-  // Helpers
-  function generateSerial() {
-    return Math.random().toString(36).substr(2, 9).toUpperCase();
+/* ===== Utilities ===== */
+const uid = () => Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,6);
+const fmtMoney = (jmd) => `JMD ${Number(jmd||0).toLocaleString()}`;
+const toLocalDate = (iso) => {
+  const d = new Date(iso);
+  const day = d.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'});
+  const time = d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+  return `${day} • ${time}`;
+};
+const fileToDataURL = (file) => new Promise((resolve,reject)=>{
+  if(!file) return resolve('');
+  const r = new FileReader();
+  r.onload = () => resolve(r.result);
+  r.onerror = reject;
+  r.readAsDataURL(file);
+});
+
+/* ===== State & Elements ===== */
+let state = { q:"", location:"All", category:"All", start:"", end:"" };
+const els = {
+  grid: document.getElementById('grid'),
+  count: document.getElementById('count'),
+  empty: document.getElementById('empty'),
+  activeFilters: document.getElementById('activeFilters'),
+  q: document.getElementById('q'),
+  location: document.getElementById('location'),
+  category: document.getElementById('category'),
+  start: document.getElementById('start'),
+  end: document.getElementById('end'),
+  clear: document.getElementById('clear'),
+  openPost: document.getElementById('openPost'),
+  postDialog: document.getElementById('postDialog'),
+  postForm: document.getElementById('postForm'),
+  fTitle: document.getElementById('fTitle'),
+  fCategory: document.getElementById('fCategory'),
+  fLocation: document.getElementById('fLocation'),
+  fVenue: document.getElementById('fVenue'),
+  fStart: document.getElementById('fStart'),
+  fEnd: document.getElementById('fEnd'),
+  fPrice: document.getElementById('fPrice'),
+  fCover: document.getElementById('fCover'),
+  fDesc: document.getElementById('fDesc'),
+  saveEventBtn: document.getElementById('saveEventBtn'),
+  exportBtn: document.getElementById('exportBtn'),
+  importFile: document.getElementById('importFile')
+};
+
+/* ===== Build filter options from stored data ===== */
+function refreshFilterOptions(list){
+  const locations = Array.from(new Set(list.map(e=>e.location).filter(Boolean))).sort();
+  const categories = Array.from(new Set(list.map(e=>e.category).filter(Boolean))).sort();
+  els.location.innerHTML = `<option value="All">All locations</option>` + locations.map(l=>`<option>${l}</option>`).join('');
+  els.category.innerHTML = `<option value="All">All categories</option>` + categories.map(c=>`<option>${c}</option>`).join('');
+}
+
+/* ===== Filtering & Render ===== */
+function applyFilters(){
+  let results = readDB();
+
+  const q = state.q.trim().toLowerCase();
+  if (q){
+    results = results.filter(e =>
+      e.title.toLowerCase().includes(q) ||
+      e.venue.toLowerCase().includes(q) ||
+      (e.description||"").toLowerCase().includes(q)
+    );
   }
-
-  // Organizer Save
-  const organizerNameInput = document.getElementById('organizerName');
-  const organizerAccountInput = document.getElementById('organizerAccount');
-  const saveOrganizerBtn = document.getElementById('saveOrganizerBtn');
-  const organizerStatus = document.getElementById('organizerStatus');
-  const eventSection = document.getElementById('event-section');
-
-  saveOrganizerBtn.onclick = () => {
-    const name = organizerNameInput.value.trim();
-    const account = organizerAccountInput.value.trim();
-    if (!name || !account) {
-      organizerStatus.textContent = 'Please enter both name and payout account.';
-      return;
-    }
-    organizer = { name, account };
-    organizerStatus.textContent = `Organizer info saved. Name: ${name}, Payout Account: ${account}`;
-    eventSection.style.display = 'block';
-  };
-
-  // Event Creation
-  const eventTitleInput = document.getElementById('eventTitle');
-  const eventDescriptionInput = document.getElementById('eventDescription');
-  const ticketPriceInput = document.getElementById('ticketPrice');
-  const ticketQuantityInput = document.getElementById('ticketQuantity');
-  const createEventBtn = document.getElementById('createEventBtn');
-  const eventStatus = document.getElementById('eventStatus');
-  const buySection = document.getElementById('buy-section');
-  const eventInfo = document.getElementById('eventInfo');
-
-  createEventBtn.onclick = () => {
-    const title = eventTitleInput.value.trim();
-    const description = eventDescriptionInput.value.trim();
-    const price = Number(ticketPriceInput.value);
-    const quantity = Number(ticketQuantityInput.value);
-
-    if (!title || !price || price <= 0 || !quantity || quantity <= 0) {
-      eventStatus.textContent = 'Please enter valid event title, ticket price, and quantity.';
-      return;
-    }
-
-    event = { title, description, price, quantity, ticketsSold: 0 };
-    eventStatus.textContent = `Event "${title}" created with ${quantity} tickets at JMD ${price} each.`;
-    eventInfo.innerHTML = `<strong>${title}</strong><br/>${description}<br/>Tickets available: <span id="ticketsAvailable">${quantity}</span>`;
-    updatePriceDisplays();
-    buySection.style.display = 'block';
-  };
-
-  // Buying tickets
-  const buyQuantityInput = document.getElementById('buyQuantity');
-  const ticketPriceDisplay = document.getElementById('ticketPriceDisplay');
-  const platformFeeDisplay = document.getElementById('platformFeeDisplay');
-  const totalPriceDisplay = document.getElementById('totalPriceDisplay');
-  const buyTicketsBtn = document.getElementById('buyTicketsBtn');
-  const buyStatus = document.getElementById('buyStatus');
-  const ticketsSection = document.getElementById('tickets-section');
-  const ticketsList = document.getElementById('ticketsList');
-  const scanSection = document.getElementById('scan-section');
-
-  function updatePriceDisplays() {
-    const qty = Number(buyQuantityInput.value) || 1;
-    if (!event) return;
-    const price = event.price * qty;
-    const fee = Math.ceil(price * 0.04);
-    ticketPriceDisplay.textContent = price.toLocaleString();
-    platformFeeDisplay.textContent = fee.toLocaleString();
-    totalPriceDisplay.textContent = price.toLocaleString(); // Buyer pays ticket price only (Option A)
+  if (state.location !== "All"){
+    results = results.filter(e => e.location === state.location);
   }
+  if (state.category !== "All"){
+    results = results.filter(e => e.category === state.category);
+  }
+  if (state.start){
+    const s = new Date(state.start + "T00:00:00");
+    results = results.filter(e => new Date(e.startsAt) >= s);
+  }
+  if (state.end){
+    const eDate = new Date(state.end + "T23:59:59");
+    results = results.filter(e => new Date(e.startsAt) <= eDate);
+  }
+  render(results);
+}
 
-  buyQuantityInput.oninput = updatePriceDisplays;
+function render(list){
+  els.grid.innerHTML = '';
+  refreshFilterOptions(readDB());
 
-  buyTicketsBtn.onclick = async () => {
-    buyStatus.textContent = '';
-    if (!event) {
-      buyStatus.textContent = 'No event available.';
-      return;
-    }
-    let qty = Number(buyQuantityInput.value);
-    if (!qty || qty <= 0) {
-      buyStatus.textContent = 'Please enter a valid ticket quantity.';
-      return;
-    }
-    if (qty > (event.quantity - event.ticketsSold)) {
-      buyStatus.textContent = `Only ${event.quantity - event.ticketsSold} tickets left.`;
-      return;
-    }
+  if (!list.length){
+    els.count.textContent = '0 events';
+    els.empty.style.display = 'block';
+    els.activeFilters.textContent = '';
+    return;
+  }
+  els.empty.style.display = 'none';
+  els.count.textContent = `${list.length} event${list.length>1?'s':''}`;
 
-    // Simulate payment processing delay
-    buyStatus.textContent = 'Processing payment...';
-    await new Promise(r => setTimeout(r, 1500));
+  const chips = [];
+  if (state.q) chips.push(`Search: “${state.q}”`);
+  if (state.location!=="All") chips.push(state.location);
+  if (state.category!=="All") chips.push(state.category);
+  if (state.start) chips.push(`From ${state.start}`);
+  if (state.end) chips.push(`To ${state.end}`);
+  els.activeFilters.textContent = chips.join(' • ');
 
-    // Deduct tickets
-    event.ticketsSold += qty;
-    document.getElementById('ticketsAvailable').textContent = event.quantity - event.ticketsSold;
-
-    // Generate tickets with serial and QR
-    for (let i = 0; i < qty; i++) {
-      const serial = generateSerial();
-      const token = btoa(JSON.stringify({ serial, event: event.title, issued: Date.now() }));
-      tickets.push({ serial, token, used: false });
-    }
-
-    buyStatus.textContent = `Successfully purchased ${qty} ticket(s).`;
-    renderTickets();
-    ticketsSection.style.display = 'block';
-    scanSection.style.display = 'block';
-  };
-
-  // Render tickets
-  function renderTickets() {
-    ticketsList.innerHTML = '';
-    if (tickets.length === 0) {
-      ticketsList.textContent = 'No tickets purchased yet.';
-      return;
-    }
-    tickets.forEach(t => {
-      const div = document.createElement('div');
-      div.className = 'ticket';
-      div.innerHTML = `
-        <div><strong>Ticket Serial:</strong> ${t.serial}</div>
-        <canvas id="qr-${t.serial}"></canvas>
-        <div>Status: <span style="color:${t.used ? 'red' : 'green'}">${t.used ? 'Used' : 'Valid'}</span></div>
+  const frag = document.createDocumentFragment();
+  list
+    .sort((a,b)=> new Date(a.startsAt)-new Date(b.startsAt))
+    .forEach(ev=>{
+      const card = document.createElement('article');
+      card.className = 'card';
+      const cover = ev.cover || '';
+      card.innerHTML = `
+        <div class="thumb">${cover ? `<img src="${cover}" alt="${ev.title}">` : ''}<div class="chip">${ev.category||'Event'}</div></div>
+        <div class="content">
+          <h3 class="title">${ev.title}</h3>
+          <div class="muted">${ev.venue||''}${ev.venue?', ':''}${ev.location||''}</div>
+          <div class="row">
+            <span class="badge">${toLocalDate(ev.startsAt)}</span>
+            ${ev.endsAt ? `<span class="badge">Ends ${toLocalDate(ev.endsAt)}</span>`:''}
+            <span class="badge">${fmtMoney(ev.priceJMD||0)}</span>
+          </div>
+          ${ev.description ? `<p class="muted" style="margin:10px 0 0">${ev.description}</p>`:''}
+        </div>
+        <div class="footer">
+          <span class="muted">${new URL(location.href).origin}</span>
+          <button class="btn" onclick="alert('This is a static demo. Checkout is not connected yet.')">View / Buy</button>
+        </div>
       `;
-      ticketsList.appendChild(div);
-      // Generate QR code
-      QRCode.toCanvas(document.getElementById(`qr-${t.serial}`), t.token, { width: 128 });
+      frag.appendChild(card);
     });
+  els.grid.appendChild(frag);
+}
+
+/* ===== Post Event (modal) ===== */
+els.openPost.addEventListener('click', ()=>{
+  els.postForm.reset();
+  els.postDialog.showModal();
+});
+
+els.saveEventBtn.addEventListener('click', async (e)=>{
+  e.preventDefault();
+
+  // Basic validation
+  const title = els.fTitle.value.trim();
+  const category = els.fCategory.value.trim();
+  const locationCity = els.fLocation.value.trim();
+  const venue = els.fVenue.value.trim();
+  const start = els.fStart.value;
+  const end = els.fEnd.value;
+  const price = Number(els.fPrice.value || 0);
+  if(!title || !category || !locationCity || !venue || !start || !end){
+    alert('Please fill in all required fields.');
+    return;
+  }
+  if (new Date(end) < new Date(start)){
+    alert('End date/time must be after start date/time.');
+    return;
   }
 
-  // Scan ticket
-  const scanSerialInput = document.getElementById('scanSerial');
-  const scanBtn = document.getElementById('scanBtn');
-  const scanResult = document.getElementById('scanResult');
+  const coverDataUrl = await fileToDataURL(els.fCover.files[0]);
 
-  scanBtn.onclick = () => {
-    const serial = scanSerialInput.value.trim().toUpperCase();
-    if (!serial) {
-      scanResult.textContent = 'Please enter a ticket serial.';
-      scanResult.style.color = 'red';
-      return;
-    }
-    const ticket = tickets.find(t => t.serial === serial);
-    if (!ticket) {
-      scanResult.textContent = 'Ticket not found.';
-      scanResult.style.color = 'red';
-      return;
-    }
-    if (ticket.used) {
-      scanResult.textContent = `Ticket already used!`;
-      scanResult.style.color = 'red';
-      return;
-    }
-    ticket.used = true;
-    scanResult.textContent = 'Ticket validated. Access granted.';
-    scanResult.style.color = 'green';
-    renderTickets();
+  const newEvent = {
+    id: uid(),
+    title, category,
+    location: locationCity,
+    venue,
+    startsAt: new Date(start).toISOString(),
+    endsAt: new Date(end).toISOString(),
+    priceJMD: price,
+    description: els.fDesc.value || '',
+    cover: coverDataUrl // base64 so it persists in LocalStorage and export file
   };
 
-  // Initialize price display
-  buyQuantityInput.value = 1;
-  updatePriceDisplays();
+  const all = readDB();
+  all.push(newEvent);
+  writeDB(all);
 
-})();
+  els.postDialog.close();
+  applyFilters();
+});
+
+/* ===== Filters wiring ===== */
+['input','change'].forEach(evt=>{
+  els.q.addEventListener(evt, ()=>{ state.q = els.q.value; applyFilters(); });
+  els.location.addEventListener(evt, ()=>{ state.location = els.location.value; applyFilters(); });
+  els.category.addEventListener(evt, ()=>{ state.category = els.category.value; applyFilters(); });
+  els.start.addEventListener(evt, ()=>{ state.start = els.start.value; applyFilters(); });
+  els.end.addEventListener(evt, ()=>{ state.end = els.end.value; applyFilters(); });
+});
+els.clear.addEventListener('click', ()=>{
+  state = { q:"", location:"All", category:"All", start:"", end:"" };
+  els.q.value = ''; els.location.value = 'All'; els.category.value = 'All'; els.start.value = ''; els.end.value = '';
+  applyFilters();
+});
+
+/* ===== Export / Import ===== */
+els.exportBtn.addEventListener('click', ()=>{
+  const data = readDB();
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'events-export.json';
+  document.body.appendChild(a); a.click(); a.remove();
+});
+
+els.importFile.addEventListener('change', async ()=>{
+  const file = els.importFile.files[0];
+  if (!file) return;
+  const text = await file.text();
+  try{
+    const list = JSON.parse(text);
+    if (!Array.isArray(list)) throw new Error('Invalid file');
+    // Simple normalization
+    const normalized = list.map(e=>({
+      id: e.id || uid(),
+      title: e.title || 'Untitled',
+      category: e.category || 'Event',
+      location: e.location || '',
+      venue: e.venue || '',
+      startsAt: e.startsAt ? new Date(e.startsAt).toISOString() : new Date().toISOString(),
+      endsAt: e.endsAt ? new Date(e.endsAt).toISOString() : '',
+      priceJMD: Number(e.priceJMD||0),
+      description: e.description || '',
+      cover: e.cover || ''
+    }));
+    writeDB(normalized);
+    applyFilters();
+    els.importFile.value = '';
+    alert('Events imported.');
+  }catch(err){
+    alert('Could not import file.');
+  }
+});
+
+/* ===== Initial paint ===== */
+if (readDB().length === 0) {
+  // Start with empty dataset for purity; or seed with a sample event:
+  writeDB([]);
+}
+refreshFilterOptions(readDB());
+applyFilters();
 </script>
-
 </body>
 </html>
